@@ -1,0 +1,67 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Diagrama de Contexto - Sistema Clínica UNFV
+
+' === Actores Principales ===
+Person(paciente, "Paciente", "Solicita citas, consulta resultados, realiza pagos")
+Person(medico, "Personal Médico", "Doctores, enfermeras, especialistas")
+Person(admin, "Personal Administrativo", "Recepcionistas, administradores")
+Person(farmaceutico, "Farmacéutico", "Gestiona medicamentos y dispensación")
+
+' === Sistema Principal ===
+System(clinica_unfv, "Sistema Clínica UNFV", "Plataforma integral para gestión de citas, historias clínicas, farmacia y diagnóstico por imágenes")
+
+' === Sistemas Externos ===
+System_Ext(sis_seguros, "Sistemas de Seguros", "SIS, EPS, seguros privados")
+System_Ext(minsa, "MINSA/DIGESA", "Entidades reguladoras del sector salud")
+System_Ext(sunat, "SUNAT", "Sistema de facturación electrónica")
+System_Ext(laboratorio, "Laboratorio Externo", "Análisis clínicos especializados")
+System_Ext(farmacia_ext, "Proveedores Farmacia", "Distribuidores de medicamentos")
+System_Ext(banco, "Sistema Bancario", "Pasarelas de pago y transferencias")
+System_Ext(sms_email, "Servicios Mensajería", "SMS, Email, notificaciones push")
+
+' === Relaciones Paciente ===
+Rel(paciente, clinica_unfv, "Solicita citas por web", "HTTPS")
+Rel(paciente, clinica_unfv, "Consulta resultados", "HTTPS")
+Rel(paciente, clinica_unfv, "Realiza pagos", "HTTPS")
+Rel(clinica_unfv, paciente, "Envía confirmaciones y resultados", "Email/SMS")
+
+' === Relaciones Personal Médico ===
+Rel(medico, clinica_unfv, "Registra consultas y diagnósticos", "HTTPS")
+Rel(medico, clinica_unfv, "Consulta historias clínicas", "HTTPS")
+Rel(clinica_unfv, medico, "Notifica citas y recordatorios", "Email")
+
+' === Relaciones Personal Administrativo ===
+Rel(admin, clinica_unfv, "Gestiona citas y pacientes", "HTTPS")
+Rel(admin, clinica_unfv, "Genera reportes", "HTTPS")
+Rel(clinica_unfv, admin, "Envía alertas del sistema", "Email")
+
+' === Relaciones Farmacéutico ===
+Rel(farmaceutico, clinica_unfv, "Gestiona inventario", "HTTPS")
+Rel(farmaceutico, clinica_unfv, "Dispensa medicamentos", "HTTPS")
+Rel(clinica_unfv, farmaceutico, "Alertas de stock", "Email")
+
+' === Integraciones Externas ===
+Rel(clinica_unfv, sis_seguros, "Valida coberturas", "API REST")
+Rel(sis_seguros, clinica_unfv, "Autoriza servicios", "API REST")
+
+Rel(clinica_unfv, minsa, "Envía reportes de cumplimiento", "HTTPS")
+Rel(minsa, clinica_unfv, "Recibe regulaciones", "Email")
+
+Rel(clinica_unfv, sunat, "Emite comprobantes electrónicos", "API SOAP")
+Rel(sunat, clinica_unfv, "Confirma emisión", "API SOAP")
+
+Rel(laboratorio, clinica_unfv, "Envía resultados de exámenes", "HL7/API")
+Rel(clinica_unfv, laboratorio, "Solicita análisis", "HL7/API")
+
+Rel(farmacia_ext, clinica_unfv, "Actualiza catálogo y precios", "API REST")
+Rel(clinica_unfv, farmacia_ext, "Realiza pedidos", "API REST")
+
+Rel(clinica_unfv, banco, "Procesa pagos", "API REST")
+Rel(banco, clinica_unfv, "Confirma transacciones", "Webhook")
+
+Rel(clinica_unfv, sms_email, "Envía notificaciones", "API REST")
+
+SHOW_LEGEND()
+@enduml

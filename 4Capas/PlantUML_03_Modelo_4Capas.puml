@@ -1,0 +1,131 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Modelo de 4 Capas - Sistema Clínica UNFV
+
+' === Actores ===
+Person(paciente, "Paciente", "Usuario final del sistema")
+Person(medico, "Personal Médico", "Doctores, enfermeras, especialistas")  
+Person(admin, "Personal Administrativo", "Recepcionistas, administradores")
+Person(farmaceutico, "Farmacéutico", "Gestión medicamentos")
+
+' === CAPA 1: PRESENTACIÓN ===
+System_Boundary(capa_presentacion, "CAPA 1: PRESENTACIÓN") {
+  Container(portal_pacientes, "Portal Web Pacientes", "React 18 + TypeScript", "Interfaz web responsive para pacientes")
+  Container(sistema_desktop, "Sistema Desktop", "WPF .NET 8", "Aplicación completa para personal")
+  Container(app_movil, "Aplicación Móvil", "React Native", "App para consultas básicas")
+  Container(kiosco_autoservicio, "Kiosco Autoservicio", "PWA + Touch UI", "Check-in y confirmaciones")
+  Container(api_gateway, "API Gateway", "Kong + JWT", "Punto único de entrada y seguridad")
+}
+
+' === CAPA 2: SERVICIOS ===
+System_Boundary(capa_servicios, "CAPA 2: SERVICIOS (MICROSERVICIOS)") {
+  Container(auth_ms, "Microservicio Autenticación", ".NET 8 + JWT", "Gestión usuarios, roles y permisos")
+  Container(pacientes_ms, "Microservicio Pacientes", ".NET 8 + EF Core", "CRUD pacientes y validaciones")
+  Container(citas_ms, "Microservicio Citas", ".NET 8 + EF Core", "Programación y gestión de citas")
+  Container(hc_ms, "Microservicio Historia Clínica", ".NET 8 + EF Core", "Gestión HC y rotación física")
+  Container(farmacia_ms, "Microservicio Farmacia", ".NET 8 + EF Core", "Inventario y dispensación")
+  Container(imagenes_ms, "Microservicio Diagnóstico", ".NET 8 + EF Core", "Estudios por imágenes")
+  Container(odonto_ms, "Microservicio Odontología", ".NET 8 + EF Core", "Servicios odontológicos")
+  Container(facturacion_ms, "Microservicio Facturación", ".NET 8 + EF Core", "Comprobantes y pagos")
+  Container(notificaciones_ms, "Microservicio Notificaciones", ".NET 8 + RabbitMQ", "Email, SMS, push")
+}
+
+' === CAPA 3: LÓGICA DE NEGOCIO ===
+System_Boundary(capa_negocio, "CAPA 3: LÓGICA DE NEGOCIO") {
+  Container(reglas_engine, "Motor de Reglas", "Microsoft Rules Engine", "Validaciones del dominio médico")
+  Container(workflow_engine, "Motor de Workflows", "MassTransit + RabbitMQ", "Procesos automatizados")
+  Container(validators, "Validadores de Negocio", "FluentValidation", "Validación de datos complejos")
+  Container(domain_services, "Servicios de Dominio", ".NET 8 + DDD", "Lógica específica del negocio")
+  Container(access_control, "Control de Acceso", "RBAC + Claims", "Autorización por recursos")
+}
+
+' === CAPA 4: ACCESO A DATOS ===
+System_Boundary(capa_datos, "CAPA 4: ACCESO A DATOS") {
+  ContainerDb(sql_primary, "SQL Server Principal", "SQL Server 2022", "Datos transaccionales principales")
+  ContainerDb(sql_farmacia, "SQL Server Farmacia", "SQL Server 2022", "Inventario y movimientos")
+  ContainerDb(mongodb_hc, "MongoDB Historias", "MongoDB 7.0", "Documentos HC y logs")
+  ContainerDb(redis_cache, "Redis Cache", "Redis 7.0", "Cache y sesiones")
+  Container(blob_imagenes, "Azure Blob Storage", "Azure Storage", "Imágenes DICOM y documentos")
+  Container(repos, "Repositorios", "Repository Pattern + EF Core", "Patrones de acceso a datos")
+}
+
+' === Sistemas Externos ===
+System_Ext(pacs, "PACS/RIS", "Sistema de imágenes médicas")
+System_Ext(sunat, "SUNAT", "Facturación electrónica")
+System_Ext(seguros, "Seguros Médicos", "SIS, EPS, privados")
+System_Ext(laboratorio, "Laboratorio Externo", "Análisis clínicos")
+System_Ext(sms_email, "Servicios Mensajería", "Proveedores SMS/Email")
+
+' === RELACIONES CAPA 1 (Usuarios -> Presentación) ===
+Rel(paciente, portal_pacientes, "Navega", "HTTPS")
+Rel(paciente, app_movil, "Usa", "HTTPS")
+Rel(paciente, kiosco_autoservicio, "Interactúa", "Touch/HTTP")
+Rel(medico, sistema_desktop, "Opera", "HTTPS")
+Rel(admin, sistema_desktop, "Administra", "HTTPS")
+Rel(farmaceutico, sistema_desktop, "Gestiona", "HTTPS")
+
+' === RELACIONES PRESENTACIÓN -> GATEWAY ===
+Rel(portal_pacientes, api_gateway, "API Calls", "REST/JSON")
+Rel(sistema_desktop, api_gateway, "API Calls", "REST/JSON")
+Rel(app_movil, api_gateway, "API Calls", "REST/JSON")
+Rel(kiosco_autoservicio, api_gateway, "API Calls", "REST/JSON")
+
+' === RELACIONES CAPA 1 -> CAPA 2 (Gateway -> Servicios) ===
+Rel(api_gateway, auth_ms, "Autentica", "REST/JSON")
+Rel(api_gateway, pacientes_ms, "Gestiona pacientes", "REST/JSON")
+Rel(api_gateway, citas_ms, "Gestiona citas", "REST/JSON")
+Rel(api_gateway, hc_ms, "Gestiona HC", "REST/JSON")
+Rel(api_gateway, farmacia_ms, "Gestiona farmacia", "REST/JSON")
+Rel(api_gateway, imagenes_ms, "Gestiona imágenes", "REST/JSON")
+Rel(api_gateway, odonto_ms, "Gestiona odontología", "REST/JSON")
+Rel(api_gateway, facturacion_ms, "Gestiona facturación", "REST/JSON")
+Rel(api_gateway, notificaciones_ms, "Envía notificaciones", "REST/JSON")
+
+' === RELACIONES CAPA 2 -> CAPA 3 (Servicios -> Lógica Negocio) ===
+Rel(pacientes_ms, reglas_engine, "Valida reglas", "In-Process")
+Rel(citas_ms, workflow_engine, "Ejecuta flujos", "Message Queue")
+Rel(hc_ms, validators, "Valida datos", "In-Process")
+Rel(farmacia_ms, domain_services, "Lógica inventario", "In-Process")
+Rel(auth_ms, access_control, "Controla acceso", "In-Process")
+Rel(facturacion_ms, reglas_engine, "Valida facturación", "In-Process")
+
+' === RELACIONES CAPA 3 -> CAPA 4 (Lógica -> Datos) ===
+Rel(reglas_engine, repos, "Consulta datos", "In-Process")
+Rel(workflow_engine, repos, "Persiste estados", "In-Process")
+Rel(validators, repos, "Valida consistencia", "In-Process")
+Rel(domain_services, repos, "Opera datos", "In-Process")
+
+' === RELACIONES CAPA 2 -> CAPA 4 (Servicios -> Datos) ===
+Rel(pacientes_ms, repos, "CRUD Pacientes", "EF Core")
+Rel(citas_ms, repos, "CRUD Citas", "EF Core")
+Rel(hc_ms, repos, "CRUD HC", "EF Core")
+Rel(farmacia_ms, repos, "CRUD Farmacia", "EF Core")
+Rel(imagenes_ms, repos, "CRUD Imágenes", "EF Core")
+Rel(auth_ms, redis_cache, "Maneja sesiones", "Redis Protocol")
+Rel(notificaciones_ms, mongodb_hc, "Log notificaciones", "MongoDB Driver")
+
+' === RELACIONES REPOSITORIOS -> BASES DE DATOS ===
+Rel(repos, sql_primary, "Consultas principales", "SQL")
+Rel(repos, sql_farmacia, "Datos farmacia", "SQL")
+Rel(repos, mongodb_hc, "Documentos HC", "MongoDB Protocol")
+Rel(repos, redis_cache, "Cache datos", "Redis Protocol")
+Rel(repos, blob_imagenes, "Archivos", "Azure SDK")
+
+' === RELACIONES CON SISTEMAS EXTERNOS ===
+Rel(imagenes_ms, pacs, "Intercambia DICOM", "DICOM/HL7")
+Rel(facturacion_ms, sunat, "Emite comprobantes", "SOAP/API")
+Rel(facturacion_ms, seguros, "Valida cobertura", "REST/API")
+Rel(hc_ms, laboratorio, "Intercambia resultados", "HL7 FHIR")
+Rel(notificaciones_ms, sms_email, "Envía mensajes", "REST/API")
+
+' === DEPENDENCIAS ENTRE SERVICIOS DE CAPA 2 ===
+Rel(citas_ms, pacientes_ms, "Consulta pacientes", "HTTP/gRPC")
+Rel(hc_ms, pacientes_ms, "Asocia HC", "HTTP/gRPC")
+Rel(facturacion_ms, citas_ms, "Factura servicios", "HTTP/gRPC")
+Rel(odonto_ms, hc_ms, "Registra en HC", "HTTP/gRPC")
+Rel(imagenes_ms, hc_ms, "Adjunta resultados", "HTTP/gRPC")
+Rel(farmacia_ms, facturacion_ms, "Genera ventas", "HTTP/gRPC")
+
+SHOW_LEGEND()
+@enduml

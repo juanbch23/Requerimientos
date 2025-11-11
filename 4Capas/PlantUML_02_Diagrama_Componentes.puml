@@ -1,0 +1,120 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+LAYOUT_LEFT_RIGHT()
+
+title Diagrama de Componentes - Sistema Clínica UNFV
+
+' === Actores ===
+Person(paciente, "Paciente", "Agenda citas, consulta resultados y realiza pagos")
+Person(personal, "Personal Clínico", "Médicos, enfermeras, administrativos, farmacéuticos")
+
+' === Capa de Presentación ===
+Container_Boundary(presentacion, "CAPA 1: PRESENTACIÓN") {
+  Component(portal_web, "Portal Web Pacientes", "React + TypeScript", "Solicitud citas, consulta resultados, pagos online")
+  Component(app_desktop, "Sistema Desktop", "WPF .NET 8", "Gestión completa administrativa y clínica")
+  Component(app_movil, "App Móvil", "React Native", "Citas básicas, notificaciones, recordatorios")
+  Component(kiosko, "Kiosko Autoservicio", "PWA", "Check-in, confirmación citas, actualizar datos")
+}
+
+' === Capa de Servicios (API Gateway) ===
+Container_Boundary(api_gateway, "API GATEWAY") {
+  Component(gateway, "Kong API Gateway", "Kong/NGINX", "Enrutamiento, autenticación, rate limiting")
+}
+
+' === Capa de Servicios ===
+Container_Boundary(servicios, "CAPA 2: SERVICIOS") {
+  Component(auth_service, "Servicio Autenticación", "JWT + OAuth 2.0", "Login, roles, permisos y sesiones")
+  Component(pacientes_service, "Servicio Pacientes", ".NET 8 API", "CRUD pacientes, validaciones, búsquedas")
+  Component(citas_service, "Servicio Citas", ".NET 8 API", "Programación, disponibilidad, recordatorios")
+  Component(hc_service, "Servicio Historia Clínica", ".NET 8 API", "Gestión HC, consultas, rotación física")
+  Component(farmacia_service, "Servicio Farmacia", ".NET 8 API", "Inventario, dispensación, control stock")
+  Component(imagenes_service, "Servicio Diagnóstico", ".NET 8 API", "Estudios por imágenes, resultados DICOM")
+  Component(odonto_service, "Servicio Odontología", ".NET 8 API", "Tratamientos, odontograma, seguimientos")
+  Component(facturacion_service, "Servicio Facturación", ".NET 8 API", "Comprobantes, seguros, pagos")
+  Component(notif_service, "Servicio Notificaciones", ".NET 8 API", "Email, SMS, push notifications")
+}
+
+' === Capa de Lógica de Negocio ===
+Container_Boundary(negocio, "CAPA 3: LÓGICA DE NEGOCIO") {
+  Component(reglas_negocio, "Motor de Reglas", "Microsoft Rules Engine", "Validaciones complejas del dominio")
+  Component(workflows, "Motor de Workflows", "MassTransit + RabbitMQ", "Procesos médicos automatizados")
+  Component(validadores, "Validadores", "FluentValidation", "Validación de datos y reglas")
+  Component(control_acceso, "Control de Acceso", "RBAC", "Permisos por roles y recursos")
+}
+
+' === Capa de Datos ===
+Container_Boundary(datos, "CAPA 4: ACCESO A DATOS") {
+  ComponentDb(sql_server, "SQL Server 2022", "RDBMS", "Datos transaccionales principales")
+  ComponentDb(mongodb, "MongoDB", "NoSQL", "Documentos HC, logs, configuraciones")
+  ComponentDb(redis, "Redis Cache", "Cache", "Sesiones, datos frecuentes, horarios")
+  Component(blob_storage, "Azure Blob Storage", "Files", "Imágenes DICOM, documentos, respaldos")
+  Component(repositorios, "Repositorios", "Entity Framework", "Patrones de acceso a datos")
+}
+
+' === Sistemas Externos ===
+System_Ext(pacs_ris, "PACS/RIS", "Sistema de imágenes médicas DICOM")
+System_Ext(sunat_fe, "SUNAT", "Facturación electrónica")
+System_Ext(seguros_ext, "Sistemas Seguros", "SIS, EPS, seguros privados")
+System_Ext(laboratorio_ext, "Laboratorio Externo", "Análisis clínicos")
+System_Ext(sms_provider, "Proveedor SMS/Email", "Servicios de mensajería")
+
+' === Relaciones Usuarios -> Presentación ===
+Rel(paciente, portal_web, "Usa")
+Rel(paciente, app_movil, "Usa")
+Rel(paciente, kiosko, "Usa")
+Rel(personal, app_desktop, "Usa")
+
+' === Relaciones Presentación -> Gateway ===
+Rel(portal_web, gateway, "HTTPS/JSON")
+Rel(app_desktop, gateway, "HTTPS/JSON")
+Rel(app_movil, gateway, "HTTPS/JSON")
+Rel(kiosko, gateway, "HTTPS/JSON")
+
+' === Relaciones Gateway -> Servicios ===
+Rel(gateway, auth_service, "REST/JSON")
+Rel(gateway, pacientes_service, "REST/JSON")
+Rel(gateway, citas_service, "REST/JSON")
+Rel(gateway, hc_service, "REST/JSON")
+Rel(gateway, farmacia_service, "REST/JSON")
+Rel(gateway, imagenes_service, "REST/JSON")
+Rel(gateway, odonto_service, "REST/JSON")
+Rel(gateway, facturacion_service, "REST/JSON")
+Rel(gateway, notif_service, "REST/JSON")
+
+' === Relaciones Servicios -> Lógica Negocio ===
+Rel(pacientes_service, reglas_negocio, "Valida")
+Rel(citas_service, workflows, "Ejecuta")
+Rel(hc_service, validadores, "Valida")
+Rel(auth_service, control_acceso, "Autoriza")
+Rel(farmacia_service, reglas_negocio, "Valida")
+
+' === Relaciones Servicios -> Datos ===
+Rel(pacientes_service, repositorios, "CRUD")
+Rel(citas_service, repositorios, "CRUD")
+Rel(hc_service, repositorios, "CRUD")
+Rel(farmacia_service, repositorios, "CRUD")
+Rel(imagenes_service, repositorios, "CRUD")
+Rel(auth_service, redis, "Cache")
+
+' === Relaciones Repositorios -> Datos ===
+Rel(repositorios, sql_server, "Entity Framework")
+Rel(repositorios, mongodb, "MongoDB Driver")
+Rel(repositorios, redis, "StackExchange.Redis")
+Rel(repositorios, blob_storage, "Azure SDK")
+
+' === Relaciones Externas ===
+Rel(imagenes_service, pacs_ris, "DICOM/HL7")
+Rel(facturacion_service, sunat_fe, "API SOAP")
+Rel(facturacion_service, seguros_ext, "API REST")
+Rel(hc_service, laboratorio_ext, "HL7 FHIR")
+Rel(notif_service, sms_provider, "API REST")
+
+' === Dependencias entre Servicios ===
+Rel(citas_service, pacientes_service, "Consulta pacientes")
+Rel(hc_service, pacientes_service, "Asocia HC")
+Rel(facturacion_service, citas_service, "Factura servicios")
+Rel(odonto_service, hc_service, "Registra en HC")
+Rel(imagenes_service, hc_service, "Adjunta resultados")
+
+SHOW_LEGEND()
+@enduml
