@@ -1,0 +1,73 @@
+@startuml
+!theme plain
+title Diagrama de Comunicación - Sistema Clínica UNFV
+
+participant Paciente
+participant "Portal Web" as portal
+participant "API Gateway" as gateway
+participant "Servicio Citas" as citas
+participant "Servicio HC" as hc
+participant "Base de Datos" as bd
+participant "Servicio Notif" as notif
+
+autonumber
+
+Paciente -> portal: 1. Accede al portal
+activate portal
+
+portal -> gateway: 2. Solicita autenticación
+activate gateway
+
+gateway -> portal: 3. Token JWT
+deactivate gateway
+
+Paciente -> portal: 4. Solicita cita online
+activate portal
+
+portal -> gateway: 5. POST /citas/programar
+activate gateway
+
+gateway -> citas: 6. ProgramarCita(datos)
+activate citas
+
+citas -> bd: 7. Verificar disponibilidad
+activate bd
+bd --> citas: 8. Horarios disponibles
+deactivate bd
+
+citas -> citas: 9. Validar reglas negocio
+note right of citas: • Máx 3 citas pendientes\n• Sin conflictos horarios\n• Paciente activo
+
+citas -> bd: 10. Guardar cita
+activate bd
+bd --> citas: 11. CitaID generado
+deactivate bd
+
+citas -> hc: 12. RegistrarCitaProgramada()
+activate hc
+hc -> bd: 13. Actualizar historia
+bd --> hc: 14. OK
+deactivate bd
+hc --> citas: 15. Confirmación
+deactivate hc
+
+citas -> notif: 16. EnviarConfirmacion()
+activate notif
+notif -> bd: 17. Guardar envío
+bd --> notif: 18. OK
+deactivate bd
+notif --> citas: 19. Enviado
+deactivate notif
+
+citas --> gateway: 20. CitaCreada
+deactivate citas
+
+gateway --> portal: 21. HTTP 201 OK
+deactivate gateway
+
+portal --> Paciente: 22. Confirmación visible + código QR
+deactivate portal
+
+Paciente -> Paciente: 23. Recibe email/SMS de confirmación
+
+@enduml

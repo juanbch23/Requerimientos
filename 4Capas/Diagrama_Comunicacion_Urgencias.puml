@@ -1,0 +1,103 @@
+@startuml
+!theme plain
+title Diagrama de Comunicación - Atención por Urgencias
+
+participant Paciente
+participant "Enfermera\nTriage" as triage
+participant "Sistema Urgencias" as urgencias
+participant "API Gateway" as gateway
+participant "Servicio Urgencias" as serv_urg
+participant "Médico Urgencias" as medico_urg
+participant "Base de Datos" as bd
+participant "Servicio Imágenes" as img
+
+autonumber
+
+Paciente -> triage: 1. Llega a urgencias
+triage -> urgencias: 2. Inicia triage
+
+urgencias -> gateway: 3. POST /triage/evaluar
+activate gateway
+gateway -> serv_urg: 4. EvaluarEstado()
+activate serv_urg
+
+serv_urg -> serv_urg: 5. Evaluar síntomas
+note right of serv_urg: • Signos vitales\n• Estado consciencia\n• Síntomas críticos
+
+serv_urg -> serv_urg: 6. Clasificar prioridad
+note right of serv_urg: P1: Crítico → 0 min\nP2: Urgente → 15 min\nP3: Menos urgente → 60 min
+
+serv_urg -> bd: 7. Guardar triaje
+bd --> serv_urg: 8. OK
+deactivate bd
+
+serv_urg --> gateway: 9. TriajeRegistrado + Prioridad
+deactivate serv_urg
+gateway --> urgencias: 10. HTTP 201 OK
+deactivate gateway
+
+urgencias -> triage: 11. Mostrar prioridad asignada
+triage --> Paciente: 12. "Prioridad 2 - Espera ~15 min"
+
+alt Prioridad 1 (Crítica)
+  Paciente -> Paciente: 13a. Va directo a atención
+else Prioridad 2 o 3
+  Paciente -> Paciente: 13b. Espera en sala
+end
+
+Paciente -> medico_urg: 14. Médico atiende
+activate medico_urg
+
+medico_urg -> urgencias: 15. Inicia historia clínica urgencia
+urgencias -> gateway: 16. POST /urgencias/consulta
+activate gateway
+gateway -> serv_urg: 17. RegistrarUrgencia()
+activate serv_urg
+
+serv_urg -> bd: 18. Crear consulta urgencia
+bd --> serv_urg: 19. UrgenciaID
+deactivate bd
+
+serv_urg --> gateway: 20. UrgenciaCreada
+deactivate serv_urg
+gateway --> urgencias: 21. HTTP 201 OK
+deactivate gateway
+
+urgencias --> medico_urg: 22. Sistema listo para registro
+
+medico_urg -> medico_urg: 23. Examina paciente
+medico_urg -> medico_urg: 24. Toma decisión
+
+alt Requiere hospitalización
+  medico_urg -> gateway: 25a. POST /urgencias/derivar
+  gateway -> serv_urg: 26a. DerivarHospitalizacion()
+  serv_urg -> bd: 27a. Guardar derivación
+  bd --> serv_urg: 28a. OK
+  serv_urg --> gateway: 29a. DerivaciónRegistrada
+  gateway --> medico_urg: 30a. HTTP 201 OK
+  medico_urg --> Paciente: 31a. "Será hospitalizado"
+  
+else Requiere estudios complementarios
+  medico_urg -> gateway: 25b. POST /imagenes/solicitar
+  gateway -> img: 26b. SolicitarEstudio()
+  img -> bd: 27b. Guardar orden
+  bd --> img: 28b. OK
+  img --> gateway: 29b. EstudioSolicitado
+  gateway --> medico_urg: 30b. HTTP 201 OK
+  medico_urg --> Paciente: 31b. "Realizarán radiografía"
+  
+else Solo medicinas y alta
+  medico_urg -> gateway: 25c. POST /recetas/urgencia
+  gateway -> serv_urg: 26c. GenerarRecetaUrgencia()
+  serv_urg -> bd: 27c. Guardar receta
+  bd --> serv_urg: 28c. RecetaID
+  serv_urg --> gateway: 29c. RecetaCreada
+  gateway --> medico_urg: 30c. HTTP 201 OK
+  medico_urg --> Paciente: 31c. "Alta con medicinas"
+end
+
+deactivate medico_urg
+
+Paciente -> Paciente: 32. Recibe documentación
+
+@enduml

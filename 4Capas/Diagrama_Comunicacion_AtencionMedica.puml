@@ -1,0 +1,114 @@
+@startuml
+!theme plain
+title Diagrama de Comunicación - Atención Médica (Consulta Externa)
+
+participant Paciente
+participant Recepción
+participant "Sistema Desktop" as desktop
+participant "API Gateway" as gateway
+participant "Servicio Atención" as atencion
+participant "Servicio HC" as hc
+participant "Servicio Farmacia" as farmacia
+participant "Base de Datos" as bd
+
+autonumber
+
+Paciente -> Recepción: 1. Llega a consulta
+Recepción -> desktop: 2. Confirma asistencia
+
+desktop -> gateway: 3. GET /citas/{citaID}
+activate gateway
+gateway -> atencion: 4. ObtenerCita()
+activate atencion
+atencion -> bd: 5. Buscar cita
+bd --> atencion: 6. Datos cita
+deactivate bd
+atencion --> gateway: 7. CitaDetalles
+deactivate atencion
+gateway --> desktop: 8. HTTP 200 OK
+deactivate gateway
+
+desktop -> gateway: 9. PUT /citas/{id}/confirmar
+activate gateway
+gateway -> atencion: 10. ConfirmarAsistencia()
+atencion -> bd: 11. Actualizar estado
+bd --> atencion: 12. OK
+deactivate atencion
+gateway --> desktop: 13. HTTP 200 OK
+deactivate gateway
+
+desktop --> Recepción: 14. Check-in completado
+
+Paciente -> Paciente: 15. Espera en sala
+
+desktop -> gateway: 16. GET /pacientes/{dni}
+activate gateway
+gateway -> atencion: 17. ObtenerDatos()
+atencion -> bd: 18. Buscar paciente
+bd --> atencion: 19. DatosPaciente
+atencion --> gateway: 20. DatosCompletos
+deactivate atencion
+gateway --> desktop: 21. HTTP 200 OK
+deactivate gateway
+
+Paciente -> desktop: 22. Entra a consultorio
+Paciente -> desktop: 23. Explica síntomas
+
+desktop -> gateway: 24. POST /consultas/registrar
+activate gateway
+gateway -> atencion: 25. RegistrarConsulta(datos)
+activate atencion
+
+atencion -> hc: 26. ActualizarHistoria()
+activate hc
+hc -> bd: 27. Guardar consulta
+bd --> hc: 28. ConsultaID
+deactivate bd
+hc --> atencion: 29. HistoriaActualizada
+deactivate hc
+
+atencion -> atencion: 30. Generar diagnóstico
+note right of atencion: • Anamnesis: síntomas\n• Examen físico\n• Diagnóstico presuntivo
+
+atencion -> bd: 31. Guardar diagnóstico
+bd --> atencion: 32. OK
+deactivate bd
+
+atencion --> gateway: 33. ConsultaRegistrada
+deactivate atencion
+
+gateway --> desktop: 34. HTTP 201 OK
+deactivate gateway
+
+desktop --> Paciente: 35. Muestra resultado
+
+Paciente -> Paciente: 36. Recibe indicaciones
+
+desktop -> gateway: 37. POST /recetas/crear
+activate gateway
+gateway -> farmacia: 38. GenerarReceta()
+activate farmacia
+farmacia -> bd: 39. Guardar receta
+bd --> farmacia: 40. RecetaID
+deactivate bd
+farmacia --> gateway: 41. RecetaCreada
+deactivate farmacia
+gateway --> desktop: 42. HTTP 201 OK
+deactivate gateway
+
+Paciente -> desktop: 43. Coge receta impresa
+
+desktop -> gateway: 44. POST /citas/{id}/finalizar
+activate gateway
+gateway -> atencion: 45. FinalizarCita()
+atencion -> bd: 46. Cambiar estado a ATENDIDA
+bd --> atencion: 47. OK
+atencion --> gateway: 48. CitaFinalizada
+deactivate atencion
+gateway --> desktop: 49. HTTP 200 OK
+deactivate gateway
+
+desktop --> Paciente: 50. Consulta finalizada
+Paciente -> Recepción: 51. Se retira
+
+@enduml
