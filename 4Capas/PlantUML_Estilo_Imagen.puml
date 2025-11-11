@@ -1,0 +1,43 @@
+@startuml
+!theme plain
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam component {
+  BackgroundColor lightgray
+  BorderColor black
+}
+
+title Diagrama de Componentes con Interfaces - Clínica UNFV
+
+' === Componentes ===
+[Portal\nWeb] as portal
+[Sistema\nMédico] as medico
+[Gestión\nCitas] as citas
+[Historia\nClínica] as hc  
+[Farmacia] as farm
+
+' === Interfaces (círculos) ===
+() ICitas
+() IHistoria
+() IRecetas
+
+' === Conexiones tipo "usa el interfaz" ===
+portal ..( ICitas : usa
+medico ..( IHistoria : usa
+medico ..( IRecetas : usa
+
+' === Conexiones tipo "realiza el interfaz" ===
+ICitas ).. citas : realiza
+IHistoria ).. hc : realiza  
+IRecetas ).. farm : realiza
+
+' === Dependencias entre componentes ===
+citas .> hc : <<usa>>\ndependencia
+hc .> farm : <<usa>>\ncomponente
+
+' === Texto explicativo ===
+note top of portal : Componente usa\nel interfaz
+note right of citas : Componente realiza\nel interfaz
+note bottom of hc : dependencia
+
+@enduml

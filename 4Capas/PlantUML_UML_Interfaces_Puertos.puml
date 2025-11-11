@@ -1,0 +1,97 @@
+@startuml
+!theme plain
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam component {
+  BackgroundColor #E8F4FD
+  BorderColor black
+  FontColor black
+}
+skinparam interface {
+  BackgroundColor white
+  BorderColor black
+}
+
+title Sistema Clínica UNFV - Componentes con Interfaces (Estilo UML Tradicional)
+
+' === Componentes Principales ===
+[Portal\nPacientes] as portal
+[Sistema\nDesktop] as desktop  
+[Gestión\nCitas] as citas
+[Historia\nClínica] as hc
+[Farmacia] as farmacia
+[Diagnóstico\nImágenes] as diagnostico
+
+' === Base de Datos ===
+database "Base\nDatos\nSQL" as bd
+
+' === Interfaces Proporcionadas (círculos llenos) ===
+() "ILogin" as ilogin
+() "ICitas" as icitas  
+() "IHistorial" as ihist
+() "IMedicamentos" as imed
+() "IEstudios" as iestudios
+() "IDatos" as idatos
+
+' === Interfaces Requeridas (semi-círculos) ===
+portal -( ilogin
+portal -( icitas
+desktop -( ilogin  
+desktop -( ihist
+desktop -( imed
+desktop -( iestudios
+
+' === Interfaces Proporcionadas por Componentes ===
+citas - ilogin : proporciona
+citas - icitas : proporciona
+hc - ihist : proporciona
+farmacia - imed : proporciona
+diagnostico - iestudios : proporciona
+bd - idatos : proporciona
+
+' === Dependencias Internas ===
+citas -( idatos
+hc -( idatos  
+farmacia -( idatos
+diagnostico -( idatos
+
+' === Sistemas Externos con Interfaces ===
+cloud "PACS/RIS" as pacs {
+  () "DICOM" as idicom
+}
+
+cloud "SUNAT" as sunat {
+  () "Facturación\nElectrónica" as ifacturacion
+}
+
+cloud "Seguros" as seguros {
+  () "Validación\nCobertura" as icobertura
+}
+
+' === Conexiones Externas ===
+diagnostico -( idicom
+farmacia -( ifacturacion  
+citas -( icobertura
+
+' === Relaciones de Uso/Dependencia ===
+citas ..> hc : <<usa>>\nactualiza HC
+hc ..> farmacia : <<usa>>\ngenera receta
+diagnostico ..> hc : <<usa>>\nadjunta resultado
+
+' === Notas Explicativas ===
+note top of portal
+  <b>Componente usa el interfaz</b>
+  (semi-círculo)
+end note
+
+note right of citas  
+  <b>Componente realiza el interfaz</b>
+  (círculo completo)
+end note
+
+note bottom of farmacia
+  <b>Dependencia</b>
+  entre componentes
+end note
+
+@enduml

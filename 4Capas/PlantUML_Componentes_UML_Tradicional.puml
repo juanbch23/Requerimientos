@@ -1,0 +1,90 @@
+@startuml
+!theme plain
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam component {
+  BackgroundColor lightblue
+  BorderColor black
+  ArrowColor red
+}
+
+title Diagrama de Componentes UML - Sistema Clínica UNFV
+
+' === Componentes Principales ===
+component [Portal Web\nPacientes] as portal
+component [Sistema Desktop\nMédicos] as desktop
+component [Gestión\nCitas] as citas
+component [Historia\nClínica] as hc
+component [Farmacia] as farmacia
+component [Diagnóstico\nImágenes] as imagenes
+component [Base de\nDatos] as bd
+
+' === Interfaces Requeridas y Proporcionadas ===
+interface "IAutenticacion" as iauth
+interface "IPaciente" as ipaciente  
+interface "ICita" as icita
+interface "IHistoriaClinica" as ihc
+interface "IFarmacia" as ifarm
+interface "IImagenes" as iimg
+interface "IPersistencia" as ipers
+
+' === Sistemas Externos ===
+component [PACS/RIS] as pacs
+component [SUNAT] as sunat
+component [Seguros] as seguros
+
+' === Interfaces Externas ===
+interface "IDICOM" as idicom
+interface "IFacturacion" as ifact
+interface "ISeguro" as iseg
+
+' === Conexiones Portal Web ===
+portal ..> iauth : usa
+portal ..> icita : usa
+portal ..> ihc : requiere
+
+' === Conexiones Sistema Desktop ===
+desktop ..> iauth : usa
+desktop ..> ihc : usa
+desktop ..> ifarm : usa
+desktop ..> iimg : usa
+
+' === Implementaciones de Interfaces ===
+iauth - citas : proporciona
+icita - citas : proporciona
+ihc - hc : proporciona
+ifarm - farmacia : proporciona
+iimg - imagenes : proporciona
+
+' === Dependencias entre Componentes ===
+citas ..> ipaciente : requiere
+citas ..> ipers : requiere
+hc ..> ipers : requiere
+farmacia ..> ipers : requiere
+imagenes ..> ipers : requiere
+
+' === Conexión con Base de Datos ===
+ipers - bd : proporciona
+
+' === Relaciones con Sistemas Externos ===
+imagenes ..> idicom : requiere
+idicom - pacs : proporciona
+
+farmacia ..> ifact : requiere  
+ifact - sunat : proporciona
+
+citas ..> iseg : requiere
+iseg - seguros : proporciona
+
+' === Dependencias Internas ===
+citas ..> ihc : "actualiza HC" 
+hc ..> ifarm : "genera receta"
+imagenes ..> ihc : "adjunta resultado"
+
+' === Notas Explicativas ===
+note top of portal : Componente usa\nel interfaz
+note right of citas : Componente realiza\nel interfaz
+note bottom of hc : Interfaz requerida
+note left of farmacia : Interfaz proporcionada
+
+@enduml
