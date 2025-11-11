@@ -2,141 +2,59 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 LAYOUT_LEFT_RIGHT()
 
-title Diagrama de Componentes Detallado - Clínica UNFV (Estilo Interface/Dependencia)
+title Diagrama de Componentes - Sistema Clínica UNFV
 
 ' === Actores ===
-Person(pac, "Paciente", "Agenda, paga y revisa resultados.")
-Person(op, "Operación/Salud", "Atiende, dispensa y gestiona HC.")
+Person(paciente, "Paciente", "Usuario final")
+Person(personal, "Personal Clínico", "Médicos y administrativos")
 
-' === Front-ends ===
-Container_Boundary(front, "Front-ends") {
-  Component(portal, "Portal Paciente", "React + TypeScript", "Citas, pagos, resultados y perfil.")
-  Component(panel, "Panel Operativo", "WPF .NET 8", "CE/Urgencias, Farmacia, Imágenes, Archivo HC.")
-  Component(movil, "App Móvil", "React Native", "Consultas básicas y notificaciones.")
-  Component(kiosko, "Kiosko", "PWA Touch", "Check-in y autoservicio.")
+' === Presentación ===
+Container_Boundary(front, "Presentación") {
+  Component(portal, "Portal Web", "React", "Citas y consultas")
+  Component(desktop, "Sistema Desktop", ".NET", "Gestión clínica")
 }
 
-' === Core (servicios principales) ===
-Container_Boundary(core, "Core Clínico UNFV (API/Servicios)") {
-  Component(auth,  "AuthN/AuthZ", "JWT/RBAC", "Usuarios, roles y permisos.")
-  Component(citas, "Agenda y Citas", "Servicio .NET", "Disponibilidad, reservas, recordatorios.")
-  Component(atn,   "Atención Clínica", "Servicio .NET", "Consulta Externa, Urgencias, Odontología.")
-  Component(img,   "Dx por Imágenes", "Servicio .NET", "Órdenes y resultados; enlace a PACS/RIS.")
-  Component(farm,  "Farmacia", "Servicio .NET", "Recetas, dispensa, ventas y kardex.")
-  Component(hc,    "HC & Archivo", "Servicio .NET", "Episodios, préstamo/rotación, trazabilidad.")
-  Component(fact,  "Facturación/Caja", "Servicio .NET", "Comprobantes y conciliación de pagos.")
-  Component(notif, "Notificaciones", "Servicio .NET", "Email/SMS/Push para citas y resultados.")
-  Component(integ, "Integración Externa", "Adapters", "PACS/RIS, SUNAT/FE, Pasarela.")
-  ComponentDb(db,  "Persistencia", "SQL + MongoDB + Redis", "Datos clínicos + documentos/escaneos.")
+' === Servicios Core ===
+Container_Boundary(core, "Servicios Core") {
+  Component(auth, "Autenticación", "JWT", "Seguridad y roles")
+  Component(citas, "Gestión Citas", ".NET API", "Programación citas")
+  Component(hc, "Historia Clínica", ".NET API", "Gestión HC")
+  Component(farm, "Farmacia", ".NET API", "Inventario medicamentos")
+  Component(img, "Diagnóstico", ".NET API", "Estudios imágenes")
+  ComponentDb(db, "Base Datos", "SQL Server", "Persistencia")
 }
 
-' === Lógica de Negocio ===
-Container_Boundary(business, "Lógica de Negocio") {
-  Component(rules, "Motor Reglas", "Rules Engine", "Validaciones complejas del dominio.")
-  Component(workflow, "Motor Workflows", "MassTransit + RabbitMQ", "Procesos automatizados.")
-  Component(validator, "Validadores", "FluentValidation", "Validación de entrada.")
-  Component(domain, "Servicios Dominio", "DDD Services", "Lógica específica clínica.")
-}
+' === Sistemas Externos ===
+System_Ext(pacs, "PACS/RIS", "Imágenes médicas")
+System_Ext(sunat, "SUNAT", "Facturación electrónica")
+System_Ext(seguros, "Seguros", "SIS, EPS")
 
-' === Sistemas externos ===
-System_Ext(pacs,   "PACS/RIS", "DICOM/HL7 para estudios de imagen")
-System_Ext(sunat,  "SUNAT/FE", "Facturación electrónica")
-System_Ext(pagos,  "Pasarela de pagos", "Autorización y liquidación")
-System_Ext(seguros, "Seguros Médicos", "SIS, EPS, seguros privados")
-System_Ext(lab,    "Laboratorio Externo", "Análisis clínicos especializados")
-System_Ext(sms,    "Proveedor SMS/Email", "Servicios de mensajería")
+' === Relaciones Principales ===
+Rel(paciente, portal, "Usa")
+Rel(personal, desktop, "Usa")
 
-' === Relaciones Front -> Core ===
-Rel(pac, portal, "Usa")
-Rel(pac, movil, "Usa")
-Rel(pac, kiosko, "Usa")
-Rel(op,  panel,  "Usa")
+Rel(portal, auth, "Login")
+Rel(desktop, auth, "Login")
 
-Rel(portal, auth,  "Login/OAuth")
-Rel(panel,  auth,  "Login/OAuth")
-Rel(movil,  auth,  "Login/OAuth")
-Rel(kiosko, auth,  "Login/OAuth")
+Rel(portal, citas, "Solicita citas", "REST")
+Rel(desktop, hc, "Gestiona HC", "REST")
+Rel(desktop, farm, "Dispensa", "REST")
 
-Rel(portal, citas, "Reservar/Reprogramar", "REST/JSON")
-Rel(portal, fact,  "Pagar en línea", "REST/JSON")
-Rel(portal, img,   "Ver estado/resultados", "REST/JSON")
-Rel(portal, hc,    "Consultar historia", "REST/JSON")
+' === Relaciones de Datos ===
+Rel(auth, db, "Usuarios")
+Rel(citas, db, "Citas")
+Rel(hc, db, "Historias")
+Rel(farm, db, "Inventario")
+Rel(img, db, "Metadatos")
 
-Rel(panel, atn,   "Atenciones", "REST/JSON")
-Rel(panel, farm,  "Dispensa/Ventas", "REST/JSON")
-Rel(panel, img,   "Órdenes/Resultados", "REST/JSON")
-Rel(panel, hc,    "Archivo/Rotación", "REST/JSON")
-Rel(panel, fact,  "Emisión/Anulación", "REST/JSON")
-Rel(panel, citas, "Gestión agenda", "REST/JSON")
+' === Integraciones Externas ===
+Rel(img, pacs, "DICOM")
+Rel(desktop, sunat, "Facturación")
+Rel(citas, seguros, "Cobertura")
 
-Rel(movil, citas,  "Consultar/Confirmar", "REST/JSON")
-Rel(movil, notif,  "Recibir push", "WebSocket")
-
-Rel(kiosko, citas, "Check-in", "REST/JSON")
-Rel(kiosko, atn,   "Confirmar llegada", "REST/JSON")
-
-' === Relaciones Servicios -> Lógica Negocio ===
-Rel(citas, rules, "Valida disponibilidad")
-Rel(citas, workflow, "Ejecuta flujo reserva")
-Rel(atn, validator, "Valida consulta")
-Rel(atn, domain, "Aplicar protocolos")
-Rel(farm, rules, "Valida dispensación")
-Rel(hc, validator, "Valida integridad")
-Rel(fact, rules, "Valida facturación")
-
-' === Relaciones Lógica -> Datos ===
-Rel(rules, db, "Consulta reglas")
-Rel(workflow, db, "Persiste estados")
-Rel(validator, db, "Valida consistencia")
-Rel(domain, db, "Opera dominio")
-
-' === Datos y eventos ===
-Rel(citas, db, "CRUD Citas")
-Rel(atn,   db, "CRUD Consultas")
-Rel(img,   db, "CRUD Metadatos")
-Rel(farm,  db, "CRUD + Kardex")
-Rel(hc,    db, "CRUD + Documentos")
-Rel(fact,  db, "CRUD Facturación")
-Rel(notif, db, "Plantillas/registro")
-Rel(auth,  db, "Sesiones/usuarios")
-
-' === Integraciones ===
-Rel(img,  pacs,  "Órdenes/Resultados", "DICOM/HL7")
-Rel(fact, sunat, "CE/GRE-SUNAT", "API")
-Rel(fact, pagos, "Autorización/conciliación", "API")
-Rel(fact, seguros, "Validar cobertura", "API")
-Rel(atn,  lab,   "Solicitar/Recibir", "HL7 FHIR")
-Rel(notif, sms,  "Enviar mensajes", "API")
-Rel(integ, pacs, "Conectores")
-Rel(integ, sunat,"Conectores")
-Rel(integ, pagos,"Conectores")
-Rel(integ, seguros,"Conectores")
-Rel(integ, lab,"Conectores")
-Rel(integ, sms,"Conectores")
-
-' === Dependencias entre servicios ===
-Rel(citas, atn, "Genera consulta", "usa")
-Rel(atn, hc, "Actualiza HC", "usa")
-Rel(atn, farm, "Prescribe medicamentos", "usa")
-Rel(atn, img, "Solicita estudios", "usa")
-Rel(farm, fact, "Genera venta", "usa")
-Rel(img, fact, "Cobra estudio", "usa")
-Rel(citas, notif, "Envía recordatorios", "usa")
-Rel(atn, notif, "Notifica resultados", "usa")
-
-' === Seguridad transversal ===
-Rel(auth, citas, "Protege", "realiza")
-Rel(auth, atn,   "Protege", "realiza")
-Rel(auth, img,   "Protege", "realiza")
-Rel(auth, farm,  "Protege", "realiza")
-Rel(auth, hc,    "Protege", "realiza")
-Rel(auth, fact,  "Protege", "realiza")
-
-' === Interfaces destacadas (estilo Observer) ===
-Rel(atn, citas, "<<interface>>\nObservadorCita", "realiza")
-Rel(hc, atn, "<<interface>>\nObservadorConsulta", "actualiza")
-Rel(notif, citas, "<<interface>>\nObservadorNotificacion", "dependencia")
-Rel(fact, farm, "<<interface>>\nObservadorVenta", "componente usa")
-Rel(img, hc, "<<interface>>\nObservadorEstudio", "componente realiza")
+' === Interfaces Clave ===
+Rel(citas, hc, "<<interface>>\nActualizaHC", "usa")
+Rel(hc, farm, "<<interface>>\nRecetaMedica", "usa")
+Rel(img, hc, "<<interface>>\nResultadoEstudio", "actualiza")
 
 @enduml

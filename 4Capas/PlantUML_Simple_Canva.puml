@@ -1,0 +1,47 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Sistema Clínica UNFV - Componentes Esenciales
+
+' === Usuarios ===
+Person(paciente, "Paciente")
+Person(medico, "Personal Médico")
+
+' === Aplicaciones ===
+Container_Boundary(apps, "Aplicaciones") {
+  Component(web, "Portal Web", "React")
+  Component(desktop, "Sistema Desktop", ".NET")
+}
+
+' === Servicios ===
+Container_Boundary(servicios, "Servicios") {
+  Component(citas, "Citas", "API")
+  Component(hc, "Historia Clínica", "API") 
+  Component(farm, "Farmacia", "API")
+  ComponentDb(bd, "Base Datos", "SQL Server")
+}
+
+' === Externos ===
+System_Ext(pacs, "PACS")
+System_Ext(sunat, "SUNAT")
+
+' === Relaciones ===
+Rel(paciente, web, "Usa")
+Rel(medico, desktop, "Usa")
+
+Rel(web, citas, "Solicita")
+Rel(desktop, hc, "Gestiona")
+Rel(desktop, farm, "Dispensa")
+
+Rel(citas, bd, "Guarda")
+Rel(hc, bd, "Almacena")
+Rel(farm, bd, "Inventario")
+
+Rel(hc, pacs, "DICOM")
+Rel(farm, sunat, "Factura")
+
+' === Interfaces ===
+Rel(citas, hc, "<<interface>>\nRegistraConsulta", "usa")
+Rel(hc, farm, "<<interface>>\nReceta", "usa")
+
+@enduml
