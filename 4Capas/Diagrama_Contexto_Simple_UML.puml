@@ -1,0 +1,48 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam defaultFontSize 11
+
+title Diagrama de Contexto - Sistema Clínica UNFV (Estilo UML Clásico)
+
+actor Paciente
+actor "Personal Médico" as medico
+actor "Personal Admin" as admin
+actor Farmacéutico
+
+[Sistema Clínica UNFV] as sistema
+
+(SUNAT) as sunat
+(MINSA/DIGESA) as minsa
+(Seguros Médicos) as seguros
+(Laboratorio) as lab
+(PACS/RIS) as pacs
+(Proveedores) as prov
+(Banca/Pagos) as banco
+(SMS/Email) as notif
+
+Paciente -> sistema : citas web
+Paciente -> sistema : consulta resultados
+sistema -> Paciente : confirmaciones
+
+medico -> sistema : diagnósticos
+medico -> sistema : consulta HC
+sistema -> medico : agenda
+
+admin -> sistema : gestión pacientes
+sistema -> admin : reportes
+
+Farmacéutico -> sistema : dispensación
+sistema -> Farmacéutico : control stock
+
+sistema -> sunat : facturación electrónica
+sistema <- seguros : validación cobertura
+sistema <- lab : resultados análisis
+sistema -> pacs : órdenes estudios
+sistema -> prov : pedidos farmacia
+sistema -> banco : procesamiento pagos
+sistema -> notif : envío mensajes
+
+sistema -> minsa : reportes sanitarios
+
+@enduml

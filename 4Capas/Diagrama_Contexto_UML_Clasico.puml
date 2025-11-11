@@ -1,0 +1,90 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam actor {
+  BackgroundColor lightblue
+  BorderColor black
+}
+skinparam component {
+  BackgroundColor lightgray
+  BorderColor black
+}
+skinparam cloud {
+  BackgroundColor lightyellow
+  BorderColor black
+}
+
+title Diagrama de Contexto UML - Sistema Clínica UNFV
+
+actor Paciente
+actor "Personal\nMédico" as medico
+actor "Personal\nAdministrativo" as admin
+actor Farmacéutico
+
+component [Sistema\nClínica UNFV] as sistema
+
+cloud "SUNAT\nFacturación\nElectrónica" as sunat
+cloud "MINSA/DIGESA\nEntidades\nReguladoras" as minsa
+cloud "Sistemas\nde Seguros\n(SIS, EPS)" as seguros
+cloud "Laboratorio\nExterno" as laboratorio
+cloud "PACS/RIS\nImágenes\nMédicas" as pacs
+cloud "Proveedores\nFarmacia" as proveedores
+cloud "Sistema\nBancario" as banco
+cloud "Servicios\nMensajería\n(SMS/Email)" as mensajeria
+
+Paciente --> sistema : Solicita citas web
+Paciente --> sistema : Consulta resultados
+Paciente --> sistema : Realiza pagos
+sistema --> Paciente : Confirmaciones
+sistema --> Paciente : Resultados médicos
+
+medico --> sistema : Registra consultas
+medico --> sistema : Consulta HC
+sistema --> medico : Agenda médica
+sistema --> medico : Recordatorios
+
+admin --> sistema : Gestiona pacientes
+admin --> sistema : Programa citas
+sistema --> admin : Reportes
+sistema --> admin : Alertas sistema
+
+Farmacéutico --> sistema : Gestiona inventario
+Farmacéutico --> sistema : Dispensa medicamentos
+sistema --> Farmacéutico : Control stock
+sistema --> Farmacéutico : Alertas caducidad
+
+sistema --> sunat : Comprobantes electrónicos
+sunat --> sistema : Validaciones fiscales
+
+sistema --> minsa : Reportes epidemiológicos
+minsa --> sistema : Normativas sanitarias
+
+sistema --> seguros : Validación coberturas
+seguros --> sistema : Autorizaciones
+
+laboratorio --> sistema : Resultados análisis
+sistema --> laboratorio : Órdenes laboratorio
+
+sistema --> pacs : Metadatos estudios
+pacs --> sistema : Imágenes DICOM
+
+proveedores --> sistema : Catálogo productos
+sistema --> proveedores : Órdenes compra
+
+sistema --> banco : Transacciones
+banco --> sistema : Confirmaciones pago
+
+sistema --> mensajeria : Notificaciones
+mensajeria --> sistema : Estado entrega
+
+note bottom of sistema
+  <b>Sistema Central</b>
+  • Gestión integral de pacientes
+  • Historias clínicas digitales
+  • Programación de citas
+  • Control farmacéutico
+  • Diagnóstico por imágenes
+  • Facturación y seguros
+end note
+
+@enduml

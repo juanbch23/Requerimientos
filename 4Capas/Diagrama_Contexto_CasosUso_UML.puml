@@ -1,0 +1,63 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+
+title Diagrama de Contexto con Casos de Uso - Sistema Clínica UNFV
+
+left to right direction
+
+actor Paciente
+actor "Personal\nMédico" as medico
+actor "Recepcionista" as recep
+actor "Farmacéutico" as farm
+actor "Administrador" as admin
+
+rectangle "Sistema Clínica UNFV" {
+  usecase "Solicitar Cita\nOnline" as UC01
+  usecase "Consultar\nResultados" as UC02
+  usecase "Realizar Pagos" as UC03
+  usecase "Registrar\nConsulta Médica" as UC04
+  usecase "Gestionar\nHistoria Clínica" as UC05
+  usecase "Programar\nCitas Presencial" as UC06
+  usecase "Dispensar\nMedicamentos" as UC07
+  usecase "Controlar\nInventario" as UC08
+  usecase "Generar\nReportes" as UC09
+  usecase "Configurar\nSistema" as UC10
+}
+
+actor "SUNAT" as sunat
+actor "Seguros\n(SIS/EPS)" as seguros
+actor "PACS/RIS" as pacs
+actor "Laboratorio" as lab
+
+Paciente --> UC01
+Paciente --> UC02
+Paciente --> UC03
+
+medico --> UC04
+medico --> UC05
+
+recep --> UC06
+recep --> UC05
+
+farm --> UC07
+farm --> UC08
+
+admin --> UC09
+admin --> UC10
+
+UC03 --> sunat : <<extends>>
+UC01 --> seguros : <<includes>>
+UC04 --> pacs : <<includes>>
+UC05 --> lab : <<includes>>
+
+UC01 ..> UC04 : <<precede>>
+UC04 ..> UC05 : <<precede>>
+UC05 ..> UC07 : <<precede>>
+
+note top of UC01 : Via portal web
+note top of UC06 : Via sistema desktop
+note right of UC04 : Incluye diagnóstico\ny tratamiento
+note bottom of UC07 : Validación de recetas\ny control de stock
+
+@enduml
