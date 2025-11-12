@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Iniciar sesión · JR Químicos</title>
+  <!-- Estilo global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Usuarios"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Formulario de login -->
+    <section class="card" style="max-width:560px;margin:18px auto 0">
+      <h1>Iniciar sesión</h1>
+      <form id="login-form" class="grid cols-1" autocomplete="off" aria-labelledby="titulo-login">
+        <div id="titulo-login" class="sr-only">Formulario de inicio de sesión</div>
+
+        <div>
+          <label for="login-user">Usuario</label>
+          <input id="login-user" type="text" placeholder="ej. admin" required />
+        </div>
+
+        <div>
+          <label for="login-pass">Contraseña</label>
+          <input id="login-pass" type="password" placeholder="••••••••" required />
+        </div>
+
+        <!-- Botones centrados y con el mismo estilo -->
+        <div class="row justify-center" role="group" aria-label="Acciones de acceso">
+          <button class="btn" type="submit">Iniciar sesión</button>
+          
+        </div>
+
+        <p class="small muted">
+          Se valida que los campos no estén vacíos, que el usuario exista y la contraseña sea correcta.
+        </p>
+      </form>
+    </section>
+
+    <hr />
+   
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Login"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- JS del módulo Usuarios -->
+  <script src="app-usu.js"></script>
+</body>
+</html>

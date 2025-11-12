@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Monitorear avance · JR Químicos</title>
+  <!-- Estilo global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Producción"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera del módulo Producción -->
+    <section class="card" aria-label="Navegación del módulo Producción" style="margin-top:18px">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) validar-orden.html">Validar OP</a>
+        <a class="btn mid" href="asignar-recursos.html">Asignar Recursos</a>
+        <a class="btn mid" href="actualizar-estado.html">Actualizar Estado</a>
+        <a class="btn " href="monitorear-orden.html" aria-current="page">Monitorear Orden</a>
+      </div>
+    </section>
+
+    <!-- Contenido principal -->
+    <section class="card" style="margin-top:18px">
+      <h1>Monitorear Avance</h1>
+
+      <!-- Filtros / Búsqueda -->
+      <div class="card" style="margin-top:8px">
+        <h2>Búsqueda</h2>
+        <div class="row" style="gap:10px; align-items:end; flex-wrap:wrap">
+          <div>
+            <label for="av-q">OP / Producto / Operario</label>
+            <input id="av-q" type="text" placeholder="OP-2025-0012 o 'Detergente' o 'S. Paredes'">
+          </div>
+          <div>
+            <label for="av-estado">Estado</label>
+            <select id="av-estado">
+              <option value="">(Todos)</option>
+              <option>Planeada</option>
+              <option>En proceso</option>
+              <option>En pausa</option>
+              <option>QC</option>
+              <option>Completada</option>
+              <option>Cancelada</option>
+            </select>
+          </div>
+          <div>
+            <label for="av-operario">Operario</label>
+            <select id="av-operario">
+              <option value="">(Todos)</option>
+              <!-- app-prod.js puede poblar la lista única de operarios -->
+            </select>
+          </div>
+          <div>
+            <label for="av-desde">Desde</label>
+            <input id="av-desde" type="date">
+          </div>
+          <div>
+            <label for="av-hasta">Hasta</label>
+            <input id="av-hasta" type="date">
+          </div>
+          <div style="flex:0 0 auto">
+            <button id="av-filtrar" class="btn mid" type="button">Aplicar filtros</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla consolidada (Asignar + Estado) -->
+      <div class="card" style="margin-top:12px">
+        <h2>Listado</h2>
+
+        <table class="table" aria-describedby="ayuda-tabla">
+          <thead>
+            <tr>
+              <th>OP</th>
+              <th>Producto</th>
+              <th>Cant.</th>
+              <th>Fechas</th>
+              <th>Progreso</th>
+              <th>Estado</th>
+              <th>Operario</th>
+              <th>Maquinaria</th>
+              <th>Turno</th>
+              <th>Programación</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="av-body"><!-- app-prod.js inyecta filas --></tbody>
+        </table>
+
+        <div id="av-empty" class="alert" style="display:none">No hay órdenes con los filtros aplicados.</div>
+
+        <p id="ayuda-tabla" class="small muted" style="margin-top:10px">
+          *El estado refleja lo guardado en <b>Actualizar Estado</b>. Operario, maquinaria, turno y programación provienen de <b>Asignar Recursos</b>. 
+        </p>
+
+        <!-- Plantilla de fila (el JS la clonará) -->
+        <template id="tpl-avance-row">
+          <tr>
+            <!-- Datos base OP -->
+            <td data-col="op"></td>
+            <td data-col="producto"></td>
+            <td data-col="cantidad"></td>
+            <td data-col="fechas"></td>
+
+            <!-- Datos de estado -->
+            <td data-col="progreso"></td>
+            <td data-col="estado"></td>
+
+            <!-- Datos de Asignar Recursos -->
+            <td data-col="operario"></td>
+            <td data-col="maquinaria"></td>
+            <td data-col="turno"></td>
+            <td data-col="programacion"></td>
+
+            <!-- Acción (mini botones) -->
+            <td data-col="accion">
+              <!-- Sugeridos: Ver / Historial / Exportar -->
+              <div class="row" style="gap:6px;flex-wrap:nowrap">
+                <button class="btn mid av-ver" data-op="">Ver</button>
+                <button class="btn mid av-hist" data-op="">Historial</button>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Monitorear avance"></jrq-footer>
+
+  <!-- Toast global -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo -->
+  <script src="app-prod.js"></script>
+</body>
+</html>

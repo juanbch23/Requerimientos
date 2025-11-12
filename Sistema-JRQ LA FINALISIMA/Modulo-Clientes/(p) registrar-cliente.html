@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar cliente · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Clientes"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Clientes -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Clientes">
+      <div class="row" style="align-items:center">
+        <a class="btn" href="(p) registrar-cliente.html" aria-current="page">Registrar Cliente</a>
+        <a class="btn mid" href="mostrar-clientes.html">Mostrar Clientes</a>
+        <a class="btn mid" href="modificar-cliente.html">Modificar Cliente</a>
+        <a class="btn mid" href="baja-cliente.html">Dar de Baja a un Cliente</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Registrar Cliente</h1>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h2>Datos del cliente</h2>
+
+          <form id="reg-form" autocomplete="off">
+            <div class="row">
+              <div>
+                <label for="doc-tipo">Tipo de documento</label>
+                <select id="doc-tipo">
+                  <option value="DNI">DNI</option>
+                  <option value="RUC">RUC</option>
+                </select>
+              </div>
+              <div>
+                <label for="doc-num">Número</label>
+                <input id="doc-num" type="text" placeholder="8 dígitos" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="cli-tipo">Tipo de cliente</label>
+                <select id="cli-tipo"><!-- se llena desde app.js --></select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="grow">
+                <label for="cli-nombre">Nombres / Razón social</label>
+                <input id="cli-nombre" type="text" placeholder="Ej. Limpio Total S.A.C. o Yolanda Quispe" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="grow">
+                <label for="cli-dir">Dirección</label>
+                <input id="cli-dir" type="text" placeholder="Av. Los Álamos Mz. A Lt. 1, Puente Piedra" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="cli-tel">Teléfono</label>
+                <input id="cli-tel" type="text" placeholder="+51 9XX XXX XXX o (01) 555-1234" />
+              </div>
+              <div>
+                <label for="cli-correo">Correo</label>
+                <input id="cli-correo" type="email" placeholder="contacto@cliente.pe" />
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="btn" type="submit">Registrar</button>
+            </div>
+
+            <p class="small muted">
+              Se valida formato de DNI (8) / RUC (11) y duplicidad; también correo y teléfono Perú.
+            </p>
+          </form>
+        </div>
+
+        <aside class="card">
+          <h2>Notas</h2>
+          <p><span class="tag">DNI</span> 8 dígitos.</p>
+          <p><span class="tag">RUC</span> 11 dígitos (prefijo 10/20).</p>
+          <p>Datos de demostración guardados en <code>localStorage</code>.</p>
+          <p>Se le asigna un código al cliente nuevo con el formato <b>“CL-00XX”</b>.</p>
+        </aside>
+      </div>
+
+      <hr />
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Registrar Cliente"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Clientes -->
+  <script src="app-clientes.js"></script>
+</body>
+</html>

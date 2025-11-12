@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mostrar clientes · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Clientes"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Clientes -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Clientes">
+      <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+        <a class="btn mid" href="(p) registrar-cliente.html">Registrar Cliente</a>
+        <a class="btn" href="mostrar-clientes.html" aria-current="page">Mostrar Clientes</a>
+        <a class="btn mid" href="modificar-cliente.html">Modificar Cliente</a>
+        <a class="btn mid" href="baja-cliente.html">Dar de Baja a un Cliente</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Clientes Registrados</h1>
+
+      <div class="card" style="margin-top:8px">
+        <h2>Filtros</h2>
+        <div class="row">
+          <div>
+            <label for="list-tipo">Tipo</label>
+            <select id="list-tipo">
+              <option value="">(Todos)</option>
+              <!-- Se llena desde app-clientes.js -->
+            </select>
+          </div>
+          <div class="grow">
+            <label for="list-q">Nombre o DNI/RUC</label>
+            <input id="list-q" type="text" placeholder="Ej. Limpio Total o 2060..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h2>Listado</h2>
+        <table class="table" id="list-table" aria-describedby="list-help">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre/Razón social</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="list-body"><!-- Llenado por app-clientes.js --></tbody>
+        </table>
+        <div id="list-empty" class="alert" style="display:none">No hay registros con los filtros aplicados.</div>
+        <p id="list-help" class="small muted" style="margin-top:10px">
+          Usa los filtros por tipo, nombre y documento para acotar la búsqueda.
+        </p>
+      </div>
+
+      <!-- Detalle del cliente seleccionado (lo llena el JS) -->
+      <div id="cliente-detail"></div>
+
+      <hr />
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Mostrar Cliente"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Clientes -->
+  <script src="app-clientes.js" defer></script>
+</body>
+</html>

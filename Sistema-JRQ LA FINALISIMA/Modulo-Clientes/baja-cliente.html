@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dar de Baja a un Cliente · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Clientes"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Clientes -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Clientes">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) registrar-cliente.html" aria-current="page">Registrar Cliente</a>
+        <a class="btn mid" href="mostrar-clientes.html">Mostrar Clientes</a>
+        <a class="btn mid" href="modificar-cliente.html">Modificar Cliente</a>
+        <a class="btn" href="baja-cliente.html">Dar de Baja a un Cliente</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Dar de Baja a un Cliente</h1>
+
+      <!-- Bloque de búsqueda y listado -->
+      <div class="card" style="margin-top:8px">
+        <h2>Listado</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="del-q">Buscar por nombre o documento</label>
+            <input id="del-q" type="text" placeholder="Ej. Yolanda o 2060..." />
+          </div>
+        </div>
+
+        <table class="table" aria-describedby="del-help" style="margin-top:10px">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre/Razón social</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="del-list"><!-- se llena desde app-clientes.js --></tbody>
+        </table>
+
+        <div id="del-empty" class="alert" style="display:none">No hay clientes para mostrar.</div>
+        <p id="del-help" class="small muted" style="margin-top:10px">
+          Si el cliente tiene operaciones activas, se marcará como <b>Inactivo</b> en lugar de eliminarse.
+        </p>
+
+        <!-- Plantilla para clonar filas desde JS -->
+        <template id="tpl-del-row">
+          <tr>
+            <td data-col="cod"></td>
+            <td data-col="nom"></td>
+            <td data-col="doc"></td>
+            <td data-col="estado"></td>
+            <td data-col="accion">
+              <div class="row" style="gap:6px;flex-wrap:nowrap;align-items:center">
+                <!-- ÚNICO botón rojo de selección -->
+                <button class="btn danger" data-act="sel" data-id="">Seleccionar</button>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </div>
+
+      <!-- Formulario de confirmación (similar a Eliminar/Inactivar Trabajador) -->
+      <div class="card" style="margin-top:12px">
+        <h2>Confirmación</h2>
+        <form id="bc-form" autocomplete="off">
+          <div class="grid cols-2">
+            <div>
+              <label for="bc-cod">Código</label>
+              <input id="bc-cod" type="text" readonly />
+            </div>
+            <div>
+              <label for="bc-doc">Documento</label>
+              <input id="bc-doc" type="text" readonly />
+            </div>
+            <div class="grow">
+              <label for="bc-nom">Nombre/Razón social</label>
+              <input id="bc-nom" type="text" readonly />
+            </div>
+            <div>
+              <label for="bc-est">Estado actual</label>
+              <input id="bc-est" type="text" readonly />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="bc-motivo">Motivo</label>
+              <input id="bc-motivo" type="text" placeholder="Ej. duplicidad / solicitud del cliente / inactividad" />
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn danger" type="submit" id="bc-baja">Dar de Baja Definitivamente</button>
+            <button class="btn mid" type="button" id="bc-inactivar">Marcar como Inactivo</button>
+          </div>
+
+          <p class="small muted">Se solicitará confirmación antes de ejecutar.</p>
+        </form>
+      </div>
+
+      <hr />
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Eliminar Cliente"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Clientes -->
+  <script src="app-clientes.js"></script>
+
+</body>
+</html>

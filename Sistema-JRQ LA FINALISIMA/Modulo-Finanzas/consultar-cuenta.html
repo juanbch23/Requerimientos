@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Estado de cuentas · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+<!-- Header/Footer globales -->
+<script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+<!-- Header global (no repetir markup en cada página) -->
+<jrq-header prefix="../" active="Finanzas"></jrq-header> 
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Finanzas -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Finanzas">
+      <div class="row" style="align-items:center">
+
+       <a class="btn mid" href="(p) registrar-transaccion.html" aria-current="page">Registrar Transacción</a>
+        <a class="btn " href="consultar-cuenta.html">Estados de Cuenta</a>
+        <a class="btn mid" href="cancelar-transaccion.html">Cancelar Transacción</a>
+
+      </div>
+    </section>
+
+       <!-- Resumen por cuenta -->
+    <section class="card" style="margin-top:12px">
+      <h2>Saldos por Cuenta</h2>
+      <table class="table" id="ec-cuentas-tabla">
+        <thead>
+          <tr>
+            <th>Cuenta</th>
+            <th>Moneda</th>
+            <th>N°/CCI</th>
+            <th>Saldo inicial</th>
+            <th>Ingresos</th>
+            <th>Gastos</th>
+            <th>Saldo actual</th>
+            <th>Conciliado</th>
+          </tr>
+        </thead>
+        <tbody id="ec-cuentas-body"><!-- rows desde app.js --></tbody>
+        <tfoot id="ec-cuentas-foot"><tr><td colspan="8">—</td></tr></tfoot>
+      </table>
+      <p class="small muted">
+        El <b>CCI</b> peruano identifica la cuenta para transferencias interbancarias y consta de 20 dígitos. La moneda local es el <b>sol</b> (código ISO 4217: PEN). :contentReference[oaicite:0]{index=0}
+      </p>
+    </section>
+
+    <!-- Filtros del estado -->
+    <section class="card" style="margin-top:18px">
+      <h1>Estado de Cuentas</h1>
+      <form id="ec-filtros" class="row" autocomplete="off">
+        <div>
+          <label for="ec-desde">Desde</label>
+          <input id="ec-desde" type="date" />
+        </div>
+        <div>
+          <label for="ec-hasta">Hasta</label>
+          <input id="ec-hasta" type="date" />
+        </div>
+        <div class="grow">
+          <label for="ec-cuenta">Cuenta</label>
+          <select id="ec-cuenta">
+            <option value="">(Todas)</option>
+            <!-- Se pobla desde app.js -->
+          </select>
+        </div>
+        <div style="flex:0 0 auto; align-self:end">
+          <button class="btn" type="submit">Aplicar</button>
+          <button class="btn mid" type="reset">Limpiar</button>
+        </div>
+      </form>
+      <p class="small muted" style="margin-top:6px">
+        Consejos: verifica el <b>saldo de apertura</b>, concilia operaciones bancarias y usa ajustes por comisiones o diferencias de redondeo.
+      </p>
+    </section>
+
+ 
+
+    <!-- Movimientos de la cuenta (detalle) -->
+    <section class="card" style="margin-top:12px">
+      <div class="row" style="align-items:center">
+        <h2 style="margin:0">Movimientos</h2>
+        <div class="spacer"></div>
+        
+      </div>
+
+      <table class="table" id="ec-tabla" style="margin-top:8px">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Medio</th>
+            <th>Glosa</th>
+            <th>Documento</th>
+            <th class="right">Importe</th>
+            <th class="right">Saldo corrido</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="ec-body"><!-- rows desde app.js --></tbody>
+        <tfoot id="ec-foot"><tr><td colspan="8">—</td></tr></tfoot>
+      </table>
+
+      <div id="ec-empty" class="alert" style="display:none">Sin movimientos para los filtros aplicados.</div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="card" style="flex:1">
+          <div class="row">
+            <div><label>Ingresos (rango)</label><div id="ec-kpi-in"    class="big">S/ 0.00</div></div>
+            <div><label>Gastos (rango)</label>  <div id="ec-kpi-out"   class="big">S/ 0.00</div></div>
+            <div><label>Variación</label>       <div id="ec-kpi-diff"  class="big">S/ 0.00</div></div>
+          </div>
+        </div>
+        <div class="card" style="flex:1">
+          <div class="row">
+            <div><label>Última conciliación</label><div id="ec-kpi-last" class="big">—</div></div>
+            <div><label>Mov. conciliados</label>   <div id="ec-kpi-conc" class="big">0</div></div>
+            <div><label>Pendientes</label>          <div id="ec-kpi-pend" class="big">0</div></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="small muted" style="margin-top:6px">
+        Recomendación: en una conciliación bancaria compara el saldo del estado bancario con el saldo del libro, explica diferencias (depósitos en tránsito, cheques pendientes, cargos bancarios) y asegura que el saldo de apertura coincida con la conciliación anterior. :contentReference[oaicite:1]{index=1}
+      </p>
+    </section>
+
+    <hr />
+    
+  </main>
+<!-- Footer global -->
+ <jrq-footer context="Registrar Transaccion"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- JS del módulo Finanzas -->
+  <script src="app.js"></script>
+</body>
+</html>

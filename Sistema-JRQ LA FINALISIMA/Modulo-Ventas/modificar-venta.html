@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modificar venta · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Ventas"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Ventas -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Ventas">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) registrar-venta.html">Registrar Venta</a>
+        <a class="btn mid" href="mostrar-ventas.html">Mostrar Ventas</a>
+        <a class="btn" href="modificar-venta.html" aria-current="page">Modificar Venta</a>
+        <a class="btn mid" href="cancelar-venta.html">Cancelar venta</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Modificar Venta</h1>
+
+      <!-- Buscar -->
+      <div class="card" style="margin-top:8px">
+        <h2>Búsqueda</h2>
+        <form id="mv-filtros" class="row" autocomplete="off">
+          <div>
+            <label for="mv-q">Venta / Cliente</label>
+            <input id="mv-q" type="text" placeholder="VTA-2025-0012 o 'Comercial Andina'" />
+          </div>
+          <div>
+            <label for="mv-desde">Desde</label>
+            <input id="mv-desde" type="date" />
+          </div>
+          <div>
+            <label for="mv-hasta">Hasta</label>
+            <input id="mv-hasta" type="date" />
+          </div>
+          
+        </form>
+      </div>
+
+      <!-- Listado -->
+      <div class="card" style="margin-top:12px">
+        <h2>Listado</h2>
+        <table class="table" id="mv-table" aria-describedby="mv-help">
+          <thead>
+            <tr>
+              <th scope="col">Venta</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Total</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="mv-body"><!-- filas dinámicas desde app-ventas.js --></tbody>
+        </table>
+
+        <div id="mv-empty" class="alert" style="display:none">No hay ventas para los filtros aplicados.</div>
+        <p id="mv-help" class="small muted" style="margin-top:10px">
+          Pulsa <b>Seleccionar</b> para cargar la venta en <b>Datos seleccionados</b>.
+        </p>
+
+        <!-- Plantilla de fila para clonar desde JS -->
+        <template id="tpl-mv-row">
+          <tr>
+            <td data-col="venta"></td>
+            <td data-col="fecha"></td>
+            <td data-col="cliente"></td>
+            <td data-col="total"></td>
+            <td data-col="accion">
+              <button class="btn mid mv-select"
+                      data-venta=""
+                      data-fecha=""
+                      data-cliente=""
+                      data-total="">
+                Seleccionar
+              </button>
+            </td>
+          </tr>
+        </template>
+      </div>
+
+      <!-- Datos seleccionados (formulario de edición) -->
+      <div class="card" style="margin-top:12px">
+        <h2>Datos seleccionados</h2>
+        <form id="mv-form" class="grid cols-2" autocomplete="off">
+          <div>
+            <div class="row">
+              <div>
+                <label for="mv-venta">Venta</label>
+                <input id="mv-venta" type="text" readonly />
+              </div>
+              <div>
+                <label for="mv-fecha">Fecha</label>
+                <input id="mv-fecha" type="date" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="grow">
+                <label for="mv-cliente">Cliente</label>
+                <select id="mv-cliente"><!-- app-ventas.js poblará --></select>
+              </div>
+              <div>
+                <label for="mv-pago">Forma de pago</label>
+                <select id="mv-pago"><!-- app-ventas.js poblará --></select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="grow">
+                <label for="mv-obs">Observación</label>
+                <input id="mv-obs" type="text" placeholder="Opcional" />
+              </div>
+            </div>
+          </div>
+
+          <aside>
+            <div class="row">
+              <div>
+                <label>Total actual</label>
+                <div id="mv-total-view"><b>S/ 0.00</b></div>
+              </div>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <button class="btn mid" type="submit" id="mv-save">Guardar cambios</button>
+              <button class="btn mid" type="button" id="mv-cancel">Cancelar</button>
+            </div>
+            <p class="small muted" style="margin-top:8px">
+              El número de venta y los ítems no se editan en esta pantalla (solo datos generales).
+            </p>
+          </aside>
+        </form>
+      </div>
+
+      <hr />
+      <div class="footer-note">JR QUÍMICOS LA ÚNICA S.A.C. · Modificar venta</div>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Modificar venta"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- JS del módulo Ventas (debe poblar tabla, manejar Seleccionar y Guardar cambios) -->
+
+  
+  <script src="app-ventas.js"></script>
+</body>
+</html>

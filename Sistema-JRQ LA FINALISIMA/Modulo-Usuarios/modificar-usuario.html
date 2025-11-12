@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modificar Usuario · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (marca Usuarios activo) -->
+  <jrq-header prefix="../" active="Usuarios"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Usuarios">
+      <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+        <a class="btn mid" href="(p) generar-credenciales.html" aria-current="page">Generar Credenciales del Trabajador</a>
+        <a class="btn mid" href="mostrar-usuarios.html">Mostrar Usuarios</a>
+        <a class="btn" href="modificar-usuario.html">Modificar Usuario</a>
+        <a class="btn mid" href="baja-usuario.html">Dar de Baja a un Usuario</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Modificar Usuario</h1>
+
+      <!-- Buscar -->
+      <div class="card" style="margin-top:8px">
+        <h2>Buscar Usuario</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="mod-q">Por código de trabajador o nombre de usuario</label>
+            <input id="mod-q" type="text" placeholder="T-0002 o 'carlos'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado con columna ‘Acción’ y botón “Seleccionar” -->
+      <div class="card" style="margin-top:12px">
+        <h2>Listado</h2>
+
+        <table class="table" id="list-table" aria-describedby="list-help">
+          <thead>
+            <tr>
+              <th scope="col">Cod-Empleado</th>
+              <th scope="col">Usuario</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Cargo</th>
+              <th scope="col">Correo</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="list-body"><!-- Se llenará desde app-usu.js --></tbody>
+        </table>
+
+        <div id="list-empty" class="alert" style="display:none">No hay usuarios para mostrar.</div>
+        <p id="list-help" class="small muted" style="margin-top:10px">
+          Usa el buscador para filtrar; pulsa <b>Seleccionar</b> para cargar el usuario en “Datos Seleccionados”.
+        </p>
+
+        <!-- Plantilla de fila para clonar desde JS -->
+        <template id="tpl-usu-row">
+          <tr>
+            <td data-col="cod"></td>
+            <td data-col="user"></td>
+            <td data-col="nom"></td>
+            <td data-col="doc"></td>
+            <td data-col="cargo"></td>
+            <td data-col="mail"></td>
+            <td data-col="est"></td>
+            <td data-col="accion">
+              <button class="btn danger usu-sel"
+                      data-cod=""
+                      data-user=""
+                      data-nom=""
+                      data-doc=""
+                      data-cargo=""
+                      data-mail=""
+                      data-est="">
+                Seleccionar
+              </button>
+            </td>
+          </tr>
+        </template>
+      </div>
+
+      <!-- Formulario de edición / Datos Seleccionados -->
+      <div class="card" style="margin-top:12px">
+        <h2>Datos Seleccionados</h2>
+
+        <form id="mod-form" autocomplete="off">
+          <!-- Identificadores / Lectura -->
+          <div class="row">
+            <div>
+              <label for="mod-cod">Cod-Empleado</label>
+              <input id="mod-cod" type="text" readonly />
+            </div>
+            <div>
+              <label for="mod-usuario">Usuario</label>
+              <input id="mod-usuario" type="text" readonly />
+            </div>
+          </div>
+         
+<h2>Unicos Cambios Posible</h2>
+   <div class="row">
+            <div>
+              <label for="mod-pass-actual">Contraseña actual</label>
+              <input id="mod-pass-actual" type="password" value="********" readonly />
+            </div>
+            <div>
+              <label for="mod-pass-nueva">Nueva contraseña</label>
+              <input id="mod-pass-nueva" type="password" placeholder="••••••••" minlength="6" />
+            </div>
+          </div>
+
+
+          </div>
+
+          <!-- Credenciales -->
+       
+          <!-- Guardar -->
+          <div class="row" style="display:flex; justify-content:center; margin-top:12px;">
+            <button class="btn" type="submit">Guardar Cambios</button>
+          </div>
+
+          <p class="small muted" style="text-align:center; margin-top:8px;">
+            Se valida formato y duplicados. No se permite cambiar el usuario desde esta pantalla.
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <hr />
+    <div class="footer-note">JR QUÍMICOS LA ÚNICA S.A.C. · Modificar Usuario</div>
+  </main>
+
+  <!-- Toast global -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Usuarios (debe poblar la tabla y manejar el botón “Seleccionar”) -->
+  <script src="app-usu.js"></script>
+</body>
+</html>

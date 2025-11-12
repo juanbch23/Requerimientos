@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Consultar egresos · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Inventario"></jrq-header>
+
+  <main class="container" role="main">
+    <section class="card" style="margin-top:18px">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) registrar-producto.html" aria-current="page">Registrar Producto</a>
+        <a class="btn" href="stock-producto.html">Mostrar Productos</a>
+        <a class="btn mid" href="modificar-producto.html">Modificar Producto</a>
+        <a class="btn mid" href="baja-producto.html">Dar de Baja un Producto</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Mostrar Productos</h1>
+      <form id="ce-filtros" class="row" autocomplete="off">
+        <div><label for="ce-desde">Desde</label><input id="ce-desde" type="date" /></div>
+        <div><label for="ce-hasta">Hasta</label><input id="ce-hasta" type="date" /></div>
+        <div>
+          <label for="ce-tipo">Tipo</label>
+          <select id="ce-tipo">
+            <option value="">(Todos)</option>
+            <option>Venta</option>
+            <option>Consumo interno</option>
+            <option>Ajuste</option>
+            <option>Devolución a proveedor</option>
+          </select>
+        </div>
+        <div class="grow">
+          <label for="ce-resp">Responsable</label>
+          <select id="ce-resp"><option value="">(Todos)</option></select>
+        </div>
+        <div style="flex:0 0 auto; align-self:end">
+          <button class="btn" type="submit">Consultar</button>
+          <button class="btn mid" type="reset">Limpiar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" style="margin-top:12px">
+      <h2>Resultados</h2>
+      <table class="table" id="ce-tabla" aria-describedby="ce-help">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Producto</th>
+            <th>Cant.</th>
+            <th>Resp.</th>
+            <th>Obs.</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="ce-body"></tbody>
+        <tfoot id="ce-foot"></tfoot>
+      </table>
+      <div id="ce-empty" class="alert" style="display:none">Sin registros disponibles.</div>
+      <p id="ce-help" class="small muted" style="margin-top:8px">
+        Pulsa <b>Seleccionar</b> para ver el detalle del producto debajo del listado.
+      </p>
+    </section>
+
+    <!-- Apartado de Detalles -->
+    <section class="card" id="ce-detalle" style="margin-top:12px; display:none" aria-live="polite">
+      <h2>Detalles</h2>
+      <div class="grid cols-2">
+        <div><b>ID:</b> <span data-det="id">—</span></div>
+        <div><b>Fecha:</b> <span data-det="fecha">—</span></div>
+        <div><b>Tipo:</b> <span data-det="tipo">—</span></div>
+        <div><b>Producto:</b> <span data-det="producto">—</span></div>
+        <div><b>Cantidad:</b> <span data-det="cant">—</span></div>
+        <div><b>Responsable:</b> <span data-det="resp">—</span></div>
+        <div class="grow"><b>Observación:</b> <span data-det="obs">—</span></div>
+      </div>
+    </section>
+
+    <hr />
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Consultar Egresos"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  // ===== Config =====
+  const CATALOGO_VERSION = "productos.v3"; // subir versión para forzar actualización
+  const qs  = (s, el=document) => el.querySelector(s);
+  const qsa = (s, el=document) => [...el.querySelectorAll(s)];
+
+  const storage = {
+    get(k, fb){ try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } },
+    set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+  };
+
+  // ===== Catálogo normalizado =====
+  const CATALOGO = [
+    // Insumos
+    { id: 'PR-0001', nombre: 'PR-0001. Ácido cítrico',        tipo: 'insumo',   costo: 12.50, stock:  80 },
+    { id: 'PR-0002', nombre: 'PR-0002. Peróxido técnico',     tipo: 'insumo',   costo:  9.10, stock: 120 },
+    { id: 'PR-0003', nombre: 'PR-0003. Envase PET 1L',        tipo: 'insumo',   costo:  1.30, stock: 500 },
+    { id: 'PR-0004', nombre: 'PR-0004. Hipoclorito 5%',       tipo: 'insumo',   costo:  5.50, stock: 120 },
+    { id: 'PR-0005', nombre: 'PR-0005. Tensoactivo X',        tipo: 'insumo',   costo: 18.00, stock:  70 },
+    { id: 'PR-0006', nombre: 'PR-0006. Fragancia Floral',     tipo: 'insumo',   costo: 41.50, stock:  15 },
+    { id: 'PR-0007', nombre: 'PR-0007. Envase PET 1L',        tipo: 'insumo',   costo:  0.78, stock: 800 },
+    // Productos terminados
+    { id: 'PR-0101', nombre: 'PR-0101. Detergente Multiusos 1L', tipo: 'producto', costo:  7.80, stock:  60 },
+    { id: 'PR-0102', nombre: 'PR-0102. Lejía 5% 1L',              tipo: 'producto', costo:  5.40, stock:  75 },
+    { id: 'PR-0103', nombre: 'PR-0103. Detergente 1L',            tipo: 'producto', costo: 11.90, stock: 200 },
+    { id: 'PR-0104', nombre: 'PR-0104. Lavavajilla 500ml',        tipo: 'producto', costo:  3.50, stock: 180 },
+    { id: 'PR-0105', nombre: 'PR-0105. Limpiavidrios 500',        tipo: 'producto', costo:  4.10, stock: 140 }
+  ];
+
+  // ===== Seeds =====
+  function seedOnce(){
+    // Empleados
+    if (!storage.get('empleados')) {
+      storage.set('empleados', [
+        { id: 'T-0001', nombre: 'María Rojas' },
+        { id: 'T-0002', nombre: 'Carlos Díaz' },
+        { id: 'T-0003', nombre: 'Ana Gómez' }
+      ]);
+    }
+    // Productos (por versión)
+    const ver = storage.get('catalogo_version');
+    if (!storage.get('productos') || ver !== CATALOGO_VERSION) {
+      storage.set('productos', CATALOGO);
+      storage.set('catalogo_version', CATALOGO_VERSION);
+    }
+    // Egresos demo (solo si no hay): id == prodId, tipo se toma del producto
+    if (!storage.get('egresos')) {
+      const hoy = new Date();
+      const iso = (d)=>d.toISOString().slice(0,10);
+      const d = (offset)=> { const x=new Date(hoy); x.setDate(x.getDate()+offset); return x; };
+      storage.set('egresos', [
+        { id:'PR-0101', fecha: iso(d(-12)), prodId:'PR-0101', cant:  8, respId:'T-0001', obs:'Pedido cliente A' },
+        { id:'PR-0004', fecha: iso(d(-11)), prodId:'PR-0004', cant:  5, respId:'T-0002', obs:'Limpieza planta' },
+        { id:'PR-0102', fecha: iso(d(-9)),  prodId:'PR-0102', cant: 12, respId:'T-0003', obs:'Cliente B (nota 145)' },
+        { id:'PR-0007', fecha: iso(d(-7)),  prodId:'PR-0007', cant: 10, respId:'T-0001', obs:'Ajuste inventario' },
+        { id:'PR-0006', fecha: iso(d(-3)),  prodId:'PR-0006', cant:  2, respId:'T-0002', obs:'Fragancia defectuosa' },
+        { id:'PR-0103', fecha: iso(d(-1)),  prodId:'PR-0103', cant:  6, respId:'T-0001', obs:'Cliente C' }
+      ]);
+    }
+  }
+
+  // ===== Data helpers =====
+  const getEmpleados = () => storage.get('empleados', []);
+  const getProductos = () => storage.get('productos', []);
+  const getEgresos   = () => storage.get('egresos', []);
+  const prodById = (id) => getProductos().find(p=>p.id===id);
+  const empById  = (id) => getEmpleados().find(e=>e.id===id);
+
+  // Mapear tipo de producto a etiqueta de UI
+  function uiTipoDeProducto(producto){
+    if (!producto) return '';
+    return producto.tipo === 'producto' ? 'producto terminado' : 'insumo';
+  }
+
+  // ===== UI helpers =====
+  function setDefaultDates(){
+    const fDesde = qs('#ce-desde');
+    const fHasta = qs('#ce-hasta');
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth();
+    const pad = (n)=>String(n).padStart(2,'0');
+    const firstOfMonth = `${y}-${pad(m+1)}-01`;
+    const today = `${y}-${pad(m+1)}-${pad(now.getDate())}`;
+    if (fDesde && !fDesde.value) fDesde.value = firstOfMonth;
+    if (fHasta && !fHasta.value) fHasta.value = today;
+  }
+
+  function renderResponsables(){
+    const sel = qs('#ce-resp');
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="">(Todos)</option>';
+    getEmpleados().forEach(e=>{
+      const opt = document.createElement('option');
+      opt.value = e.id;
+      opt.textContent = `${e.nombre} (${e.id})`;
+      sel.appendChild(opt);
+    });
+    if ([...sel.options].some(o=>o.value===current)) sel.value = current;
+  }
+
+  // Poblar el combo Tipo con solo “insumo” y “producto terminado”
+  function renderTipos(){
+    const sel = qs('#ce-tipo');
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = `
+      <option value="">(Todos)</option>
+      <option value="insumo">insumo</option>
+      <option value="producto terminado">producto terminado</option>
+    `;
+    if ([...sel.options].some(o=>o.value===current)) sel.value = current;
+  }
+
+  function inRange(dateStr, desdeStr, hastaStr){
+    if (!desdeStr && !hastaStr) return true;
+    const d = dateStr;
+    return (!desdeStr || d >= desdeStr) && (!hastaStr || d <= hastaStr);
+  }
+
+  // ===== Filtrado y render =====
+  function applyFilters(){
+    const desde = qs('#ce-desde').value || '';
+    const hasta = qs('#ce-hasta').value || '';
+    const tipoF = (qs('#ce-tipo').value || '').trim().toLowerCase(); // "" | "insumo" | "producto terminado"
+    const resp  = (qs('#ce-resp').value || '').trim();
+
+    let rows = getEgresos().filter(r => {
+      const prod = prodById(r.prodId);
+      const tipoUI = uiTipoDeProducto(prod); // "insumo" | "producto terminado"
+      const okFecha = inRange(r.fecha, desde, hasta);
+      const okTipo  = !tipoF || tipoUI === tipoF;
+      const okResp  = !resp || r.respId === resp;
+      return okFecha && okTipo && okResp;
+    });
+
+    // Orden fecha desc; si empatan, por id prod
+    rows.sort((a,b)=> (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : a.prodId.localeCompare(b.prodId)));
+
+    renderTable(rows);
+  }
+
+  function renderTable(rows){
+    const tbody = qs('#ce-body');
+    const tfoot = qs('#ce-foot');
+    const empty = qs('#ce-empty');
+    const det   = qs('#ce-detalle');
+
+    tbody.innerHTML = '';
+    tfoot.innerHTML = '';
+    if (det) det.style.display = 'none';
+
+    if (!rows.length){
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    let totalCant = 0;
+
+    rows.forEach(r=>{
+      const tr = document.createElement('tr');
+      const prod = prodById(r.prodId);
+      const emp  = empById(r.respId);
+      const prodLabel = prod ? prod.nombre : r.prodId;
+      const empLabel  = emp  ? emp.nombre : r.respId;
+      const tipoUI    = uiTipoDeProducto(prod);
+
+      totalCant += Number(r.cant) || 0;
+
+      tr.innerHTML = `
+        <td>${r.prodId}</td>             <!-- ID = ID del producto -->
+        <td>${r.fecha}</td>
+        <td>${tipoUI}</td>               <!-- Tipo = insumo | producto terminado -->
+        <td>${prodLabel}</td>
+        <td>${r.cant}</td>
+        <td>${empLabel}</td>
+        <td>${r.obs ?? ''}</td>
+        <td><button type="button" class="btn danger ce-select" data-id="${r.prodId}" data-fecha="${r.fecha}">Seleccionar</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Pie: total cantidades
+    const trf = document.createElement('tr');
+    trf.innerHTML = `
+      <td colspan="4" style="text-align:right"><b>Total movimientos:</b></td>
+      <td><b>${totalCant}</b></td>
+      <td colspan="3"></td>
+    `;
+    tfoot.appendChild(trf);
+
+    // Acciones
+    qsa('.ce-select', tbody).forEach(btn=>{
+      btn.addEventListener('click', ()=> {
+        const prodId = btn.getAttribute('data-id');
+        const fecha  = btn.getAttribute('data-fecha');
+        // Buscar el registro exacto (puede haber varios del mismo producto en distintas fechas)
+        const row = getEgresos().find(x=>x.prodId===prodId && x.fecha===fecha) || getEgresos().find(x=>x.prodId===prodId);
+        if (!row) return;
+        paintDetail(row);
+        toast('Registro seleccionado');
+      });
+    });
+  }
+
+  function paintDetail(r){
+    const det = qs('#ce-detalle');
+    if (!det) return;
+    const prod = prodById(r.prodId);
+    const emp  = empById(r.respId);
+    const tipoUI = uiTipoDeProducto(prod);
+
+    det.style.display = 'block';
+    qs('[data-det="id"]').textContent       = r.prodId; // ID = del producto
+    qs('[data-det="fecha"]').textContent    = r.fecha;
+    qs('[data-det="tipo"]').textContent     = tipoUI;
+    qs('[data-det="producto"]').textContent = prod ? prod.nombre : r.prodId;
+    qs('[data-det="cant"]').textContent     = r.cant;
+    qs('[data-det="resp"]').textContent     = emp ? `${emp.nombre} (${r.respId})` : r.respId;
+    qs('[data-det="obs"]').textContent      = r.obs ?? '';
+  }
+
+  function toast(msg){
+    const el = qs('#toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 1800);
+  }
+
+  // ===== Init =====
+  function init(){
+    seedOnce();
+
+    // Reemplazar opciones del filtro Tipo por (Todos | insumo | producto terminado)
+    renderTipos();
+    // Responsables
+    renderResponsables();
+    // Fechas por defecto
+    setDefaultDates();
+
+    // Filtros
+    qs('#ce-filtros').addEventListener('submit', e=>{
+      e.preventDefault();
+      applyFilters();
+    });
+    qs('#ce-filtros').addEventListener('reset', ()=>{
+      setTimeout(()=>{ renderTipos(); renderResponsables(); setDefaultDates(); applyFilters(); }, 0);
+    });
+
+    // Primera carga
+    applyFilters();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+
+  <!-- Tu JS módulo Inventario -->
+  
+
+</body>
+</html>

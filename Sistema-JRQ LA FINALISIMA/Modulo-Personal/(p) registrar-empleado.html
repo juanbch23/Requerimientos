@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar Empleado · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Personal"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Personal">
+      <div class="row" style="align-items:center">
+        <a class="btn" href="(p) registrar-empleado.html" aria-current="page">Registrar Empleado</a>
+        <a class="btn mid" href="mostrar-empleado.html">Mostrar Empleado</a>
+        <a class="btn mid" href="modificar-empleado.html">Modificar Empleado</a>
+        <a class="btn mid" href="baja-empleado.html">Dar de Baja a un Empleado</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Registrar Empleado</h1>
+
+      <form id="rt-form" class="grid cols-2" autocomplete="off">
+        <div>
+          <label for="rt-dni">DNI</label>
+          <input id="rt-dni" type="text" inputmode="numeric" minlength="8" maxlength="8" placeholder="8 dígitos" required />
+          <p class="small muted">* Debe tener 8 dígitos (Perú).</p>
+        </div>
+        
+
+        <div>
+          <label for="rt-nombres">Nombres</label>
+          <input id="rt-nombres" type="text" placeholder="Ana Lucía" required />
+        </div>
+        <div>
+          <label for="rt-apellidos">Apellidos</label>
+          <input id="rt-apellidos" type="text" placeholder="Salazar Rojas" required />
+        </div>
+
+        <div class="grow">
+          <label for="rt-direccion">Dirección</label>
+          <input id="rt-direccion" type="text" placeholder="Av. Los Álamos Mz. A Lt. 1, Puente Piedra" />
+        </div>
+        <div>
+          <label for="rt-telefono">Teléfono</label>
+          <input id="rt-telefono" type="text" placeholder="+51 9XX XXX XXX" />
+          <p class="small muted">Formato peruano recomendado (+51 …).</p>
+        </div>
+
+        <div>
+          <label for="rt-area">Área</label>
+          <select id="rt-area" required>
+            <option>Producción</option>
+            <option>Ventas</option>
+            <option>Finanzas</option>
+            <option>Reportes</option>
+            <option>Inventario</option>
+          </select>
+        </div>
+        <div>
+          <label for="rt-cargo">Cargo</label>
+          <select id="rt-cargo" required>
+            <option value="">— Seleccionar —</option>
+            <option>Administrador</option>
+            <option>Operario</option>
+            <option>Vendedor</option>
+            <option>Jefe de Producción</option>
+            <option>Gerente General</option>
+            <option>Contador</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="rt-salario">Salario (S/)</label>
+          <input id="rt-salario" type="number" step="0.01" min="0" placeholder="1800.00" required />
+        </div>
+        <div>
+          <label for="rt-estado">Estado</label>
+          <select id="rt-estado">
+            <option>Activo</option>
+            <option>Inactivo</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="rt-fecha">Fecha de ingreso</label>
+          <input id="rt-fecha" type="date" />
+        </div>
+
+        <div class="row" style="align-items:end">
+          <button class="btn" type="submit">Registrar Empleado</button>
+          <a class="btn" href="(p) generar-credenciales.html">Añadir Credenciales</a>
+        </div>
+      </form>
+      <p class="small muted" style="margin-top:8px">
+        Se valida que el <b>DNI</b> no esté repetido antes de guardar.
+      </p>
+    </section>
+
+    <hr />
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Registrar Trabajador"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

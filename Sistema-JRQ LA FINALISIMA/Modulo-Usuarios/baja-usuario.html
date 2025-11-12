@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dar de Baja a un Usuario · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Usuarios"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Navegación local -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Usuarios">
+      <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+        <a class="btn mid" href="(p) generar-credenciales.html">Generar Credenciales del Trabajador</a>
+        <a class="btn mid" href="mostrar-usuarios.html">Mostrar Usuarios</a>
+        <a class="btn mid" href="modificar-usuario.html">Modificar Usuario</a>
+        <a class="btn" href="baja-usuario.html" aria-current="page">Dar de Baja a un Usuario</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Eliminar / Inactivar Usuario</h1>
+
+      <!-- Buscar -->
+      <div class="card" style="margin-top:8px">
+        <h2>Buscar</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="bu-q">Por código de empleado o usuario</label>
+            <input id="bu-q" type="text" placeholder="T-0005 o 'carlos'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado con ÚNICO botón rojo “Seleccionar” -->
+      <div class="card" style="margin-top:12px">
+        <h2>Listado</h2>
+        <table class="table" id="bu-table" aria-describedby="bu-help">
+          <thead>
+            <tr>
+              <th scope="col">Cod-Empleado</th>
+              <th scope="col">Usuario</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Cargo</th>
+              <th scope="col">Correo</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="bu-body"><!-- filas dinámicas desde app-usu.js --></tbody>
+        </table>
+
+        <div id="bu-empty" class="alert" style="display:none">No hay usuarios para mostrar.</div>
+        <p id="bu-help" class="small muted" style="margin-top:10px">
+          Si el usuario tiene dependencias activas, se recomienda <b>inactivarlo</b> en lugar de eliminarlo.
+        </p>
+
+        <!-- Plantilla estándar: ÚNICO botón rojo -->
+        <template id="tpl-bu-row">
+          <tr>
+            <td data-col="cod"></td>
+            <td data-col="usu"></td>
+            <td data-col="nombre"></td>
+            <td data-col="doc"></td>
+            <td data-col="cargo"></td>
+            <td data-col="correo"></td>
+            <td data-col="estado"></td>
+            <td data-col="accion">
+              <button class="btn danger bu-select"
+                      data-cod=""
+                      data-usu=""
+                      data-nom=""
+                      data-doc=""
+                      data-cargo=""
+                      data-correo=""
+                      data-estado="">
+                Seleccionar
+              </button>
+            </td>
+          </tr>
+        </template>
+      </div>
+
+      <!-- Confirmación (botón rojo + botón vecino) -->
+      <div class="card" style="margin-top:12px">
+        <h2>Confirmación</h2>
+        <form id="bu-form" autocomplete="off">
+          <div class="grid cols-2">
+            <div>
+              <label for="bu-cod">Cod-Empleado</label>
+              <input id="bu-cod" type="text" readonly />
+            </div>
+            <div>
+              <label for="bu-usu">Usuario</label>
+              <input id="bu-usu" type="text" readonly />
+            </div>
+            <div class="grow">
+              <label for="bu-nom">Nombre</label>
+              <input id="bu-nom" type="text" readonly />
+            </div>
+            <div>
+              <label for="bu-est">Estado actual</label>
+              <input id="bu-est" type="text" readonly />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="bu-motivo">Motivo</label>
+              <input id="bu-motivo" type="text" placeholder="Ej. cese de labores / duplicado / seguridad" />
+            </div>
+          </div>
+
+          <div class="row" style="gap:8px;align-items:end">
+            <button class="btn danger" type="submit" id="bu-baja">Dar de Baja al Usuario</button>
+            <button class="btn mid" type="button" id="bu-inactivar">Marcar como Inactivo</button>
+          </div>
+
+          <p class="small muted">Se solicitará confirmación antes de ejecutar.</p>
+        </form>
+      </div>
+
+      <hr />
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Eliminar Usuarios"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Tu lógica JS -->
+  <script src="app-usu.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generar Credenciales · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Personal"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Personal">
+      <div class="row" style="align-items:center">
+
+        <a class="btn" href="(p) generar-credenciales.html" aria-current="page">Generar Credenciales del Trabajador</a>
+        <a class="btn mid" href="mostrar-usuarios.html">Mostrar Usuarios</a>
+        <a class="btn mid" href="modificar-usuario.html">Modificar Usuario</a>
+        <a class="btn mid" href="baja-usuario.html">Dar de Baja a un Usuario</a>
+        
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Generación de Credenciales del Trabajador</h1>
+
+      <!-- Dos columnas: Datos (izq) / Credenciales (der) -->
+      <form id="rt-form" class="grid cols-2" autocomplete="off">
+        <!-- Columna izquierda: Datos del trabajador -->
+        <fieldset>
+          <h3 class="section-title">Datos del Trabajador</h3>
+
+          <div>
+            <label for="rt-dni">DNI</label>
+            <input id="rt-dni" type="text" inputmode="numeric" minlength="8" maxlength="8"
+                   placeholder="8 dígitos (Datos Completados)" required />
+            <p class="small muted">* Debe tener 8 dígitos (Perú).</p>
+          </div>
+
+          <div>
+            <label for="rt-codigo">Código de Empleado</label>
+            <input id="rt-codigo" type="text" placeholder="T-0021 (Datos Completados)" />
+          </div>
+
+          <div>
+            <label for="rt-nombres">Nombres</label>
+            <input id="rt-nombres" type="text" placeholder="Ana Lucía (Datos Completados)" required />
+          </div>
+
+          <div>
+            <label for="rt-apellidos">Apellidos</label>
+            <input id="rt-apellidos" type="text" placeholder="Salazar Rojas (Datos Completados)" required />
+          </div>
+
+          <div class="grow">
+            <label for="rt-direccion">Dirección</label>
+            <input id="rt-direccion" type="text"
+                   placeholder="Av. Los Álamos Mz. A Lt. 1, Puente Piedra (Datos Completados)" />
+          </div>
+
+          <div>
+            <label for="rt-telefono">Teléfono</label>
+            <input id="rt-telefono" type="text" placeholder="+51 9XX XXX XXX (Datos Completados)" />
+          </div>
+
+          <div>
+            <label for="rt-area">Área</label>
+            <input id="rt-area" type="text" placeholder="Área (Datos Completados)" />
+          </div>
+
+          <div>
+            <label for="rt-cargo">Cargo</label>
+            <input id="rt-cargo" type="text" placeholder="Cargo (Datos Completados)" />
+          </div>
+
+          <div>
+            <label for="rt-salario">Salario (S/)</label>
+            <input id="rt-salario" type="number" step="0.01" min="0"
+                   placeholder="1800.00 (Datos Completados)" required />
+          </div>
+
+          <div>
+            <label for="rt-estado">Estado</label>
+            <input id="rt-estado" type="text" placeholder="Activo / Inactivo (Datos Completados)" />
+          </div>
+
+          <div>
+            <label for="rt-fecha">Fecha de ingreso</label>
+            <input id="rt-fecha" type="date" />
+            <p class="small muted">* Datos extraídos del Registro de Personal.</p>
+          </div>
+        </fieldset>
+
+        <!-- Columna derecha: Credenciales -->
+        <fieldset>
+          <h3 class="section-title">Credenciales</h3>
+
+          <div class="row">
+            <div>
+              <label for="reg-user">Usuario</label>
+              <input id="reg-user" type="text" placeholder="usuario" required />
+            </div>
+            <div>
+              <label for="reg-pass">Contraseña</label>
+              <input id="reg-pass" type="password" placeholder="••••••••" minlength="6" required />
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <p class="small muted">
+              La contraseña se guardará de forma segura en producción.
+            </p>
+          </div>
+
+          <div class="row" style="align-items:end; margin-top:12px">
+            <button class="btn" type="submit">Registrar Credenciales de Usuario</button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+
+    <hr />
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Registrar Trabajador"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- JS del módulo (sin script inline) -->
+  <script src="app.js"></script>
+</body>
+</html>

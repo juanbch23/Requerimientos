@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Actualizar estado · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <jrq-header prefix="../" active="Producción"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera del módulo Producción -->
+    <section class="card" aria-label="Navegación del módulo Producción" style="margin-top:18px">
+      <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+        <a class="btn mid" href="(p) validar-orden.html">Validar OP</a>
+        <a class="btn mid" href="asignar-recursos.html">Asignar Recursos</a>
+        <a class="btn" href="actualizar-estado.html" aria-current="page">Actualizar Estado</a>
+        <a class="btn mid" href="monitorear-orden.html">Monitorear Orden</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Actualizar Estado de Orden de Producción</h1>
+
+      <!-- Buscar OP -->
+      <div class="card" style="margin-top:8px">
+        <h2>Buscar</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="av-q">Por OP, producto o lote</label>
+            <input id="av-q" type="text" placeholder="OP-2025-0007 o 'Detergente' o 'L-001'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado -->
+      <div class="card" style="margin-top:12px">
+        <h2>Listado</h2>
+
+        <table class="table" aria-describedby="ayuda-tabla">
+          <thead>
+            <tr>
+              <th>OP</th>
+              <th>Producto</th>
+              <th>Cant.</th>
+              <th>Fechas</th>
+              <th>Progreso</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="av-body"><!-- filas desde app-prod.js --></tbody>
+        </table>
+
+        <div id="av-empty" class="alert" style="display:none">No hay órdenes con los filtros aplicados.</div>
+        <p id="ayuda-tabla" class="small muted" style="margin-top:10px">
+          Usa el buscador para filtrar. En <b>Acción</b>, selecciona un nuevo estado y pulsa <b>Guardar estado</b>.
+        </p>
+
+        <!-- Plantilla de fila (clonada por JS) -->
+        <template id="tpl-av-row">
+          <tr>
+            <td data-col="op"></td>
+            <td data-col="prod"></td>
+            <td data-col="cant"></td>
+            <td data-col="fechas"></td>
+            <td data-col="prog"></td>
+            <td data-col="estado"></td>
+            <td data-col="accion">
+              <div class="row" style="gap:6px;flex-wrap:nowrap;align-items:center">
+                <select class="av-estado"
+                        aria-label="Cambiar estado"
+                        data-op="">
+                  <!-- Los valores se pueden ajustar en app-prod.js -->
+                  <option>Planificada</option>
+                  <option>En proceso</option>
+                  <option>Envasado</option>
+                  <option>Control de calidad</option>
+                  <option>Pausada</option>
+                  <option>Completada</option>
+                  <option>Cancelada</option>
+                </select>
+                <button class="btn mid av-save" type="button" data-op="">
+                  Guardar estado
+                </button>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <jrq-footer context="Actualizar Estado"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Producción (debe poblar #av-body y manejar cambios de estado) -->
+  <script src="app-prod.js"></script>
+
+  
+
+</body>
+</html>

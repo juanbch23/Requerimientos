@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Asignar recursos · JR Químicos</title>
+  <!-- Estilo global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Producción"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera del módulo (debajo del header) -->
+    <section class="card" aria-label="Navegación del módulo Producción" style="margin-top:18px">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) validar-orden.html">Validar OP</a>
+        <a class="btn " href="asignar-recursos.html">Asignar Recursos</a>
+        <a class="btn mid" href="actualizar-estado.html">Actualizar Estado</a>
+        <a class="btn mid" href="monitorear-orden.html">Monitorear Orden</a>
+      </div>
+    </section>
+
+    <!-- Contenido principal -->
+    <section class="card" style="margin-top:18px">
+      <h1>Asignar recursos</h1>
+
+      <form id="frm-recursos" autocomplete="off">
+        <div class="row">
+          <div class="grow">
+            <label for="r-op">OP</label>
+            <select id="r-op"></select>
+          </div>
+          <div class="grow">
+            <label for="r-operario">Operario</label>
+            <select id="r-operario"></select>
+          </div>
+          <div class="grow">
+            <label for="r-maq">Maquinaria</label>
+            <select id="r-maq"></select>
+          </div>
+          <div class="grow" style="min-width:180px">
+            <label for="r-turno">Turno</label>
+            <select id="r-turno"></select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="r-desde">Desde</label>
+            <input id="r-desde" type="date" />
+          </div>
+          <div>
+            <label for="r-hasta">Hasta</label>
+            <input id="r-hasta" type="date" />
+          </div>
+          <div style="flex:0.6">
+            <label class="sr-only">Acción</label>
+            <button class="btn" type="submit">Asignar</button>
+          </div>
+        </div>
+      </form>
+
+      <p class="small muted" style="margin-top:10px">
+        *Valida solapes de agenda de operario/maquinaria en el período seleccionado.
+      </p>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Asignar recursos"></jrq-footer>
+
+  <!-- Toast global (si lo usas desde app.js) -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo -->
+  <script src="app-prod.js"></script>
+</body>
+</html>

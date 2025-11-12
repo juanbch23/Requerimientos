@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reporte de Producción · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Reportes"></jrq-header>
+
+  <main class="container" role="main">
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Reportes">
+      <div class="row" style="gap:10px;flex-wrap:wrap">
+        <a class="btn mid" href="reporte-personal.html">Reporte de Personal</a>
+        <a class="btn mid" href="reporte-clientes.html">Reporte de Clientes</a>
+        <a class="btn" href="reporte-produccion.html" aria-current="page">Reporte de Producción</a>
+        <a class="btn mid" href="reporte-inventario.html">Reporte de Inventario</a>
+        <a class="btn mid" href="reporte-estado-cuentas.html">Reporte de Estado de Cuentas</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Generar Reporte de Producción</h1>
+
+      <div class="grid cols-2">
+        <!-- Filtros (leídos por app-rep.js) -->
+        <form id="rp-filtros" class="card" autocomplete="off" aria-labelledby="rp-filtros-t" role="form">
+          <h2 id="rp-filtros-t">Filtros</h2>
+          <div class="row">
+            <div>
+              <label for="rp-desde">Desde</label>
+              <input id="rp-desde" type="date" />
+            </div>
+            <div>
+              <label for="rp-hasta">Hasta</label>
+              <input id="rp-hasta" type="date" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="rp-linea">Línea</label>
+              <select id="rp-linea">
+                <option value="">(Todas)</option>
+                <option>Mezclado</option>
+                <option>Envasado</option>
+                <option>Etiquetado</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn" type="submit">Aplicar Filtros</button>
+            <button class="btn mid" type="reset">Limpiar</button>
+          </div>
+          <p class="small muted">Incluye OP finalizadas o en proceso, con indicadores clave.</p>
+        </form>
+
+        <!-- KPIs (actualizados por app-rep.js) -->
+        <aside class="card" id="rp-resumen" aria-live="polite">
+          <h2>Indicadores</h2>
+          <div class="grid cols-3">
+            <div class="kpi">
+              <div class="kpi-title">Eficiencia</div>
+              <div class="kpi-value" id="rp-kpi-ef">—%</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Tiempo prom.</div>
+              <div class="kpi-value" id="rp-kpi-tm">— h</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Desperdicio</div>
+              <div class="kpi-value" id="rp-kpi-dw">—%</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Resultados -->
+      <div class="card" style="margin-top:12px">
+        <h2>Detalle</h2>
+        <table class="table" id="rp-tabla" aria-describedby="rp-ayuda">
+          <thead>
+            <tr>
+              <th scope="col">OP</th>
+              <th scope="col">Línea</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Planif.</th>
+              <th scope="col">Real</th>
+              <th scope="col">Inicio–Fin</th>
+              <th scope="col">Eficiencia</th>
+              <th scope="col">Desperdicio</th>
+            </tr>
+          </thead>
+          <tbody id="rp-body"><!-- Llenado por app-rep.js --></tbody>
+          <tfoot id="rp-foot"><!-- Totales --></tfoot>
+        </table>
+        <div id="rp-empty" class="alert" style="display:none">No hay datos para el período/filtros seleccionados.</div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn mid" id="rp-exp-pdf" type="button">Exportar PDF</button>
+          <button class="btn mid" id="rp-exp-xls" type="button">Exportar Excel</button>
+        </div>
+        <p id="rp-ayuda" class="small muted">Los resultados muestran órdenes de producción y sus métricas asociadas.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Reportes Produccion"></jrq-footer>
+
+  <!-- Toast global -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Reportes -->
+  <script src="app-rep.js" defer></script>
+</body>
+</html>

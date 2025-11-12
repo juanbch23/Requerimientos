@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JR Químicos · Sistema Web</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="home.js"></script>
+  <script type="module" src="ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global -->
+  <jrq-header prefix="./" active=""></jrq-header>
+
+  <main class="container" role="main">
+    <!-- HERO -->
+    <section class="card">
+      <div class="hero">
+        <div>
+          <h1>Soluciones de limpieza fabricadas en Lima</h1>
+          <p class="muted">
+            JR Químicos La Única S.A.C. (Puente Piedra, Lima). Desde 2021 elaboramos
+            <b>jabones, detergentes</b> y preparados de limpieza para hogares y empresas.
+          </p>
+          <div class="row" style="align-items:center">
+            <a class="btn" href="Modulo-Produccion/(p) validar-orden.html">Crear orden de producción</a>
+            <a class="btn" style="background:var(--accent)" href="Modulo-Ventas/(p) registrar-venta.html">Registrar venta</a>
+          </div>
+        </div>
+
+        <!-- Slider -->
+        <div class="slider" id="heroSlider" aria-label="Galería JR Químicos">
+          <img class="active" alt="Línea de llenado de botellas" src="images/image01.png" />
+          <img alt="Jabón líquido en línea de producción" src="images/image02.png" />
+          <img alt="Botellas en banda de producción" src="images/image03.png" />
+          <div class="slider-dots" id="sliderDots" aria-hidden="true">
+            <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORIA + MÉTRICAS -->
+    <section class="grid cols-2" style="margin-top:18px">
+      <div class="card">
+        <h2>Nuestra historia</h2>
+        <div class="timeline">
+          <div class="timeline-item"><span class="dot"></span><div><b>2021</b> – Inicio de operaciones y primeras líneas.</div></div>
+          <div class="timeline-item"><span class="dot"></span><div><b>2022–2023</b> – Escalamiento y estándares de calidad.</div></div>
+          <div class="timeline-item"><span class="dot"></span><div><b>2024–2025</b> – Integración del sistema web.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Hoy en números</h2>
+        <div class="grid cols-3" style="align-items:center; text-align:center">
+          <div><div style="font-size:32px; font-weight:800" id="kpi1">0</div><div class="muted">Pedidos atendidos</div></div>
+          <div><div style="font-size:32px; font-weight:800" id="kpi2">0</div><div class="muted">Líneas de producto</div></div>
+          <div><div style="font-size:32px; font-weight:800" id="kpi3">0</div><div class="muted">Órdenes en curso</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTOS DESTACADOS -->
+    <section class="card" style="margin-top:18px">
+      <h2>Productos destacados</h2>
+      <div class="grid cols-3">
+        <article class="product">
+          <img alt="Detergente líquido" src="images/image04.png" />
+          <div><b>Detergente Líquido 5L</b></div>
+          <div class="muted">Alto poder de limpieza y espuma controlada.</div>
+          <div><span class="badge">Hogar</span> <span class="badge">Institucional</span></div>
+        </article>
+        <article class="product">
+          <img alt="Desinfectante" src="images/image05.png" />
+          <div><b>Desinfectante 1L</b></div>
+          <div class="muted">Formulado para superficies de alto tránsito.</div>
+          <div><span class="badge">Amonio cuaternario</span></div>
+        </article>
+        <article class="product">
+          <img alt="Suavizante" src="images/image06.png" />
+          <div><b>Suavizante 5L</b></div>
+          <div class="muted">Fragancias perdurables y suavidad en tejidos.</div>
+          <div><span class="badge">Lavandería</span></div>
+        </article>
+      </div>
+      <div class="row">
+        <a class="btn" href="Modulo-Inventario/stock-producto.html">Ver catálogo</a>
+        <a class="btn" style="background:var(--accent)" href="Modulo-Ventas/(p) registrar-venta.html">Nueva venta</a>
+      </div>
+    </section>
+
+    <!-- GALERÍA -->
+    <section class="card" style="margin-top:18px">
+      <h2>Galería</h2>
+      <div class="grid cols-3">
+                <img alt="Banda de producción" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image07.png" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image08.png" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image09.png" />
+        <img alt="Banda de producción" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image10.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image11.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image12.jpg" />
+        <img alt="Banda de producción" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image13.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image14.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image15.jpg" />
+        <img alt="Banda de producción" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image16.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image17.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image18.jpg" />
+        <img alt="Banda de producción" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image19.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image20.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image21.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image22.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image23.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image24.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image25.jpg" />
+        <img alt="Planta de bebidas (simil envase PET)" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image26.jpg" />
+        <img alt="Botellas en línea" style="width:100%; border-radius:12px; height:160px; object-fit:cover"
+             src="images/image27.jpg" />
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Inicio"></jrq-footer>
+</body>
+</html>

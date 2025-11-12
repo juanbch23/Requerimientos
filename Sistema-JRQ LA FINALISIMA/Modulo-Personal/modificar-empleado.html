@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modificar trabajador · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+<!-- Header/Footer globales -->
+<script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+<!-- Header global (no repetir markup en cada página) -->
+<jrq-header prefix="../" active="Personal"></jrq-header> 
+
+  <main class="container" role="main">
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Personal">
+      <div class="row" style="align-items:center">
+
+        <a class="btn mid" href="(p) registrar-empleado.html" aria-current="page">Registrar Empleado</a>
+        <a class="btn mid" href="mostrar-empleado.html">Mostrar Empleado</a>
+        <a class="btn " href="modificar-empleado.html">Modificar Empleado</a>
+        <a class="btn mid" href="baja-empleado.html">Dar de Baja a un Empleado</a>
+
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Modificar Trabajador</h1>
+
+      <div class="card" style="margin-top:8px">
+        <h2>Buscar</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="mt-q">Por DNI o nombre</label>
+            <input id="mt-q" type="text" placeholder="65432109 o 'Ana'" />
+          </div>
+        </div>
+        <div id="mt-results" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h2>Datos seleccionados</h2>
+        <form id="mt-form" autocomplete="off">
+          <div class="row">
+            <div>
+              <label for="mt-codigo">Código</label>
+              <input id="mt-codigo" type="text" readonly />
+            </div>
+            <div>
+              <label for="mt-dni">DNI</label>
+              <input id="mt-dni" type="text" readonly />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="mt-nombre">Nombre completo</label>
+              <input id="mt-nombre" type="text" readonly />
+            </div>
+            <div>
+              <label for="mt-estado">Estado</label>
+              <select id="mt-estado">
+                <option>Activo</option>
+                <option>Inactivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="mt-dir">Dirección</label>
+              <input id="mt-dir" type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="mt-area">Área</label>
+              <select id="mt-area">
+                <option>Producción</option>
+                <option>Ventas</option>
+                <option>Logística</option>
+                <option>Calidad</option>
+                <option>Administración</option>
+              </select>
+            </div>
+            <div>
+              <label for="mt-cargo">Cargo</label>
+              <select id="mt-cargo">
+                <option>Operario</option>
+                <option>Jefe de Producción</option>
+                <option>Vendedor</option>
+                <option>Analista de Calidad</option>
+                <option>Asistente Administrativo</option>
+              </select>
+            </div>
+            <div>
+              <label for="mt-salario">Salario (S/)</label>
+              <input id="mt-salario" type="number" step="0.01" min="0" />
+            </div>
+          </div>
+
+          <div class="row" style="align-items:end">
+            <button class="btn" type="submit">Guardar Cambios</button>
+        
+          </div>
+
+          <p class="small muted">No se permite modificar el DNI ni el código aquí. Se valida integridad antes de guardar.</p>
+        </form>
+      </div>
+      <hr />
+      
+    </section>
+  </main>
+<!-- Footer global -->
+ <jrq-footer context="Modificar Trabajador"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+(() => {
+  // ========= Config =========
+  const EMP_VER = "empleados.v1"; // súbelo si cambias el seed
+  const qs  = (s, el=document) => el.querySelector(s);
+  const qsa = (s, el=document) => [...el.querySelectorAll(s)];
+  const toast = (msg) => { const el = qs('#toast'); if(!el) return; el.textContent = msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 1800); };
+
+  // ========= Seed provisto =========
+  const seed = {
+    empleados: [
+      { cod:"T-0001", dni:"74561234", nombres:"Ana Lucía",   apellidos:"Salazar Rojas",   area:"Producción", cargo:"Operario",            salario:1800.00, estado:"Activo",   fechaIngreso:"2025-01-15", direccion:"Av. Los Álamos 123", telefono:"+51 987 111 111" },
+      { cod:"T-0002", dni:"72895412", nombres:"Carlos",      apellidos:"Pérez Torres",    area:"Ventas",     cargo:"Vendedor",            salario:2200.00, estado:"Activo",   fechaIngreso:"2025-02-03", direccion:"Jr. Lima 234",      telefono:"+51 987 222 222" },
+      { cod:"T-0003", dni:"70654321", nombres:"María",       apellidos:"Quispe Rojas",    area:"Inventario", cargo:"Administrador",       salario:2600.00, estado:"Inactivo", fechaIngreso:"2024-11-22", direccion:"Calle Puno 56",     telefono:"+51 987 333 333" },
+      { cod:"T-0004", dni:"71478596", nombres:"Diego",       apellidos:"Huamán Soto",     area:"Producción", cargo:"Operario",            salario:1850.00, estado:"Activo",   fechaIngreso:"2025-03-12", direccion:"Mza. A Lote 8",     telefono:"+51 987 444 444" },
+      { cod:"T-0005", dni:"71234567", nombres:"Lucía",       apellidos:"Torres Ramos",    area:"Ventas",     cargo:"Vendedor",            salario:2250.00, estado:"Activo",   fechaIngreso:"2025-04-02", direccion:"Psj. Piura 90",     telefono:"+51 987 555 555" },
+      { cod:"T-0006", dni:"70123456", nombres:"Pedro",       apellidos:"Alvarado Vera",   area:"Producción", cargo:"Jefe de Producción",  salario:3500.00, estado:"Activo",   fechaIngreso:"2025-01-28", direccion:"Cdra. 3, Arequipa", telefono:"+51 987 666 666" },
+      { cod:"T-0007", dni:"76981234", nombres:"Valeria",     apellidos:"Campos León",     area:"Finanzas",   cargo:"Contador",            salario:3000.00, estado:"Activo",   fechaIngreso:"2025-03-25", direccion:"Av. Grau 777",      telefono:"+51 987 777 777" },
+      { cod:"T-0008", dni:"76543219", nombres:"Hugo",        apellidos:"Paredes Díaz",    area:"Producción", cargo:"Operario",            salario:1900.00, estado:"Activo",   fechaIngreso:"2025-05-10", direccion:"Jr. Cusco 12",      telefono:"+51 987 888 888" },
+      { cod:"T-0009", dni:"70987654", nombres:"Fiorella",    apellidos:"Chávez Gómez",    area:"Inventario", cargo:"Administrador",       salario:2650.00, estado:"Activo",   fechaIngreso:"2025-06-05", direccion:"Av. Petit 101",     telefono:"+51 987 999 999" },
+      { cod:"T-0010", dni:"70012345", nombres:"Ignacio",     apellidos:"Fernández Rojo",  area:"Finanzas",   cargo:"Contador",            salario:3050.00, estado:"Activo",   fechaIngreso:"2025-06-19", direccion:"Calle Sol 404",     telefono:"+51 900 111 222" },
+      { cod:"T-0011", dni:"75551234", nombres:"Estefany",    apellidos:"Poma Huertas",    area:"Producción", cargo:"Operario",            salario:1820.00, estado:"Activo",   fechaIngreso:"2025-07-01", direccion:"Mza B Lote 10",     telefono:"+51 900 222 333" },
+      { cod:"T-0012", dni:"73334444", nombres:"Rodrigo",     apellidos:"Távara Núñez",    area:"Reportes",   cargo:"Administrador",       salario:2700.00, estado:"Activo",   fechaIngreso:"2025-07-18", direccion:"Av. Chile 800",     telefono:"+51 900 333 444" }
+    ]
+  };
+
+  // ========= Storage helpers =========
+  const storage = {
+    get(k, fb){ try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } },
+    set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+  };
+  const getEmpleados = () => storage.get('empleados', []);
+  const saveEmpleados = (arr) => storage.set('empleados', arr);
+
+  // ========= Seed + versión =========
+  function seedOnce(){
+    if (!storage.get('empleados') || storage.get('empleados_version') !== EMP_VER){
+      saveEmpleados(seed.empleados);
+      storage.set('empleados_version', EMP_VER);
+    }
+  }
+
+  // ========= Util =========
+  const norm = s => (s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"").toLowerCase();
+  const empNombreCompleto = e => `${e.nombres} ${e.apellidos}`.trim();
+
+  function ensureOption(select, value){
+    if (!value) return;
+    const exists = [...select.options].some(o => o.value === value || o.textContent === value);
+    if (!exists){
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = value;
+      select.appendChild(opt);
+    }
+  }
+
+  // ========= Render de resultados =========
+  function renderResults(list){
+    const wrap = qs('#mt-results');
+    wrap.innerHTML = '';
+    if (!list.length){
+      wrap.innerHTML = '<div class="alert">Sin coincidencias.</div>';
+      return;
+    }
+    const table = document.createElement('table');
+    table.className = 'table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Código</th><th>DNI</th><th>Nombre</th><th>Área</th><th>Cargo</th><th>Estado</th><th>Acción</th>
+        </tr>
+      </thead>
+      <tbody></tbody>`;
+    const tbody = table.querySelector('tbody');
+
+    list.forEach(e=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${e.cod}</td>
+        <td>${e.dni}</td>
+        <td>${empNombreCompleto(e)}</td>
+        <td>${e.area}</td>
+        <td>${e.cargo}</td>
+        <td>${e.estado}</td>
+        <td><button type="button" class="btn mid sel" data-cod="${e.cod}">Seleccionar</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    wrap.appendChild(table);
+
+    // Wire selección
+    qsa('.sel', wrap).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const cod = btn.getAttribute('data-cod');
+        const emp = getEmpleados().find(x=>x.cod===cod);
+        if (!emp) return;
+        loadForm(emp);
+        toast('Trabajador cargado para edición');
+      });
+    });
+  }
+
+  // ========= Búsqueda (AHORA: lista completa si el filtro está vacío) =========
+  function doSearch(){
+    const q = qs('#mt-q').value.trim();
+    const emps = getEmpleados();
+
+    // Si no hay texto, mostrar TODOS
+    if (!q){
+      const all = [...emps].sort((a,b)=> a.cod.localeCompare(b.cod));
+      renderResults(all);
+      return;
+    }
+
+    const qn = norm(q);
+    const rows = emps.filter(e=>{
+      const byDNI  = e.dni.includes(q) || e.cod.includes(q.toUpperCase());
+      const texto  = `${e.cod} ${e.dni} ${e.nombres} ${e.apellidos} ${e.area} ${e.cargo}`;
+      const byName = norm(texto).includes(qn);
+      return byDNI || byName;
+    }).sort((a,b)=> a.cod.localeCompare(b.cod));
+
+    renderResults(rows);
+  }
+
+  // ========= Formulario =========
+  let currentCod = null;
+
+  function loadForm(e){
+    currentCod = e.cod;
+    // Campos readonly
+    qs('#mt-codigo').value = e.cod;
+    qs('#mt-dni').value    = e.dni;
+    qs('#mt-nombre').value = empNombreCompleto(e);
+
+    // Estado
+    const selEstado = qs('#mt-estado');
+    ensureOption(selEstado, e.estado);
+    selEstado.value = e.estado;
+
+    // Dirección
+    qs('#mt-dir').value = e.direccion || '';
+
+    // Área y Cargo (agregar opciones que falten)
+    const selArea  = qs('#mt-area');
+    const selCargo = qs('#mt-cargo');
+    ensureOption(selArea, e.area);
+    ensureOption(selCargo, e.cargo);
+    selArea.value  = e.area;
+    selCargo.value = e.cargo;
+
+    // Salario
+    qs('#mt-salario').value = Number(e.salario || 0).toFixed(2);
+  }
+
+  function saveForm(ev){
+    ev.preventDefault();
+    if (!currentCod){ toast('Selecciona un trabajador primero.'); return; }
+
+    const estado  = qs('#mt-estado').value;
+    const dir     = qs('#mt-dir').value.trim();
+    const area    = qs('#mt-area').value;
+    const cargo   = qs('#mt-cargo').value;
+    let salario   = parseFloat(qs('#mt-salario').value);
+    if (!Number.isFinite(salario) || salario < 0){ toast('Salario inválido.'); return; }
+    salario = +salario.toFixed(2);
+
+    const emps = getEmpleados();
+    const idx = emps.findIndex(x=>x.cod === currentCod);
+    if (idx === -1){ toast('No se encontró el registro a actualizar.'); return; }
+
+    // Actualizar campos editables
+    emps[idx] = {
+      ...emps[idx],
+      estado,
+      direccion: dir,
+      area,
+      cargo,
+      salario
+      // Se mantienen: cod, dni, nombres, apellidos, fechaIngreso, telefono
+    };
+    saveEmpleados(emps);
+    toast('Cambios guardados');
+    // Refrescar (se mantiene el filtro actual)
+    doSearch();
+  }
+
+  function cancelForm(){
+    currentCod = null;
+    qs('#mt-form').reset();
+  }
+
+  // ========= Init =========
+  function init(){
+    seedOnce();
+
+    // Buscar al escribir (con debounce)
+    let t;
+    qs('#mt-q').addEventListener('input', ()=>{
+      clearTimeout(t);
+      t = setTimeout(doSearch, 200);
+    });
+
+    // Submit/Cancel
+    qs('#mt-form').addEventListener('submit', saveForm);
+    qs('#mt-cancel').addEventListener('click', cancelForm);
+
+    // 🚀 Mostrar listado completo al cargar
+    doSearch();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+
+</body>
+</html>

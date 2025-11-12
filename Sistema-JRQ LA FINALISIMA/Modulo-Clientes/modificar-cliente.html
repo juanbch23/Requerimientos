@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modificar cliente · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <jrq-header prefix="../" active="Clientes"></jrq-header>
+
+  <main class="container" role="main">
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Clientes">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) registrar-cliente.html">Registrar Cliente</a>
+        <a class="btn mid" href="mostrar-clientes.html" aria-current="page">Mostrar Clientes</a>
+        <a class="btn" href="modificar-cliente.html">Modificar Cliente</a>
+        <a class="btn mid" href="baja-cliente.html">Dar de Baja a un Cliente</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Modificar cliente</h1>
+
+      <!-- LISTADO (mismo esquema que “Mostrar clientes”) -->
+      <div class="card" style="margin-top:8px">
+        <h2>Listado</h2>
+        <div class="row">
+          <div>
+            <label for="list-tipo">Tipo</label>
+            <select id="list-tipo">
+              <option value="">(Todos)</option>
+              <!-- lo llena app-clientes.js -->
+            </select>
+          </div>
+          <div class="grow">
+            <label for="list-q">Nombre o DNI/RUC</label>
+            <input id="list-q" type="text" placeholder="Ej. Limpio Total o 2060..." />
+          </div>
+          >
+        </div>
+
+        <table class="table" id="list-table" aria-describedby="list-help" style="margin-top:10px">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre/Razón social</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="list-body"><!-- lo llena app-clientes.js --></tbody>
+        </table>
+
+        <div id="list-empty" class="alert" style="display:none">No hay registros con los filtros aplicados.</div>
+        <p id="list-help" class="small muted" style="margin-top:10px">
+          Usa los filtros por tipo, nombre y documento. Pulsa <b>Seleccionar</b> para cargar el cliente en el formulario inferior.
+        </p>
+
+        <!-- Plantilla de fila con botón “Seleccionar”.
+             app-clientes.js puede ignorar la plantilla y renderizar como siempre;
+             si la usa, aquí ya está la columna Acción lista. -->
+        <template id="tpl-list-row">
+  <tr>
+    <td data-col="cod"></td>
+    <td data-col="nom"></td>
+    <td data-col="doc"></td>
+    <td data-col="tipo"></td>
+    <td data-col="estado"></td>
+    <td data-col="accion">
+      <button class="btn danger mc-select" type="button">Seleccionar</button>
+    </td>
+  </tr>
+</template>
+
+      </div>
+
+      <!-- DATOS SELECCIONADOS -->
+      <div class="card" style="margin-top:12px">
+        <h2>Datos seleccionados</h2>
+        <form id="mod-form" autocomplete="off">
+          <div class="row">
+            <div>
+              <label for="mod-cod">Código</label>
+              <input id="mod-cod" type="text" readonly />
+            </div>
+            <div>
+              <label for="mod-doc">Documento</label>
+              <input id="mod-doc" type="text" readonly />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="mod-nombre">Nombre / Razón social</label>
+              <input id="mod-nombre" type="text" readonly />
+            </div>
+            <div>
+              <label for="mod-tipo">Tipo de cliente</label>
+              <select id="mod-tipo"><!-- lo puedes llenar también desde app-clientes.js --></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="mod-dir">Dirección</label>
+              <input id="mod-dir" type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="mod-tel">Teléfono</label>
+              <input id="mod-tel" type="text" placeholder="+51 9XX XXX XXX o (01) 555-1234" />
+            </div>
+            <div>
+              <label for="mod-correo">Correo</label>
+              <input id="mod-correo" type="email" placeholder="contacto@cliente.pe" />
+            </div>
+          </div>
+
+          <div class="row" style="align-items:end">
+            <button class="btn" type="submit">Guardar cambios</button>
+          </div>
+
+          <p class="small muted">
+            Se valida formato de teléfono y correo. El documento no es editable.
+          </p>
+        </form>
+      </div>
+
+      <hr />
+    </section>
+  </main>
+
+  <jrq-footer context="Modificar Cliente"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Tu JS existente que ya carga los datos en la tabla -->
+  <script src="app-clientes.js" defer></script>
+
+  <!-- Mini-script: usa LO YA RENDERIZADO por app-clientes.js para llenar el form -->
+  
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reporte de Personal · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Reportes"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Reportes">
+      <div class="row" style="flex-wrap:wrap;gap:10px">
+        <a class="btn" href="reporte-personal.html" aria-current="page">Reporte de Personal</a>
+        <a class="btn mid" href="reporte-clientes.html">Reporte de Clientes</a>
+        <a class="btn mid" href="reporte-produccion.html">Reporte de Producción</a>
+        <a class="btn mid" href="reporte-inventario.html">Reporte de Inventario</a>
+        <a class="btn mid" href="reporte-estado-cuentas.html">Reporte de Estado de Cuentas</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Generar Reporte de Personal</h1>
+
+      <div class="grid cols-2">
+        <!-- Filtros (se llenan/leen desde app-rep.js) -->
+        <form id="rp-filtros" class="card" autocomplete="off" role="form">
+          <h2>Filtros</h2>
+          <div class="row">
+            <div>
+              <label for="rp-desde">Desde</label>
+              <input id="rp-desde" type="date" />
+            </div>
+            <div>
+              <label for="rp-hasta">Hasta</label>
+              <input id="rp-hasta" type="date" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="rp-area">Área</label>
+              <select id="rp-area">
+                <option value="">(Todas)</option>
+                <!-- opciones dinámicas -->
+              </select>
+            </div>
+            <div>
+              <label for="rp-cargo">Cargo</label>
+              <select id="rp-cargo">
+                <option value="">(Todos)</option>
+                <!-- opciones dinámicas -->
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="rp-estado">Estado</label>
+              <select id="rp-estado">
+                <option value="">(Todos)</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn" type="submit">Aplicar Filtros</button>
+            <button class="btn mid" type="reset">Limpiar</button>
+          </div>
+          <p class="small muted">Usa los filtros para acotar el período, área/cargo y estado.</p>
+        </form>
+
+        <!-- Resumen / KPIs (se actualiza desde app-rep.js) -->
+        <aside class="card" id="rp-resumen" aria-live="polite">
+          <h2>Resumen</h2>
+          <div class="grid cols-2">
+            <div class="kpi">
+              <div class="kpi-title">Total empleados</div>
+              <div class="kpi-value" id="rp-kpi-total">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Activos</div>
+              <div class="kpi-value" id="rp-kpi-activos">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Inactivos</div>
+              <div class="kpi-value" id="rp-kpi-inactivos">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Áreas</div>
+              <div class="kpi-value" id="rp-kpi-areas">—</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Resultados (tabla y exportaciones) -->
+      <div class="card" style="margin-top:12px">
+        <h2>Resultados</h2>
+        <table class="table" id="rp-tabla" aria-describedby="rp-ayuda">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>DNI</th>
+              <th>Área</th>
+              <th>Cargo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="rp-body"><!-- filas dinámicas --></tbody>
+          <tfoot id="rp-foot"><!-- totales por estado/área si lo necesitas --></tfoot>
+        </table>
+        <div id="rp-empty" class="alert" style="display:none">No hay resultados con los filtros aplicados.</div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn mid" id="rp-exp-pdf" type="button">Exportar PDF</button>
+          <button class="btn mid" id="rp-exp-xls" type="button">Exportar Excel</button>
+        </div>
+
+        <p id="rp-ayuda" class="small muted">Los resultados se llenan automáticamente según los filtros aplicados.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Reporte de Personal"></jrq-footer>
+
+  <!-- Toast global -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Reportes -->
+  <script src="app-rep.js" defer></script>
+</body>
+</html>

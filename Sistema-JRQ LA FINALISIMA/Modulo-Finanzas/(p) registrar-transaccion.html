@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar transacción · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Finanzas"></jrq-header> 
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Finanzas -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Finanzas">
+      <div class="row" style="align-items:center">
+        <a class="btn" href="(p) registrar-transaccion.html" aria-current="page">Registrar Transacción</a>
+        <a class="btn mid" href="consultar-cuenta.html">Estados de Cuenta</a>
+        <a class="btn mid" href="cancelar-transaccion.html">Cancelar Transacción</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Registrar Transacción Financiera</h1>
+
+      <form id="fx-form" class="grid cols-2" autocomplete="off">
+        <!-- Columna izquierda -->
+        <div>
+          <h2>Datos de la Operación</h2>
+
+          <div class="row">
+            <div>
+              <label for="fx-tipo">Tipo</label>
+              <select id="fx-tipo">
+                <option value="Ingreso" selected>Ingreso</option>
+                <option value="Gasto">Gasto</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="fx-fecha">Fecha</label>
+              <input id="fx-fecha" type="date" />
+            </div>
+            <div>
+              <label for="fx-moneda">Moneda</label>
+              <select id="fx-moneda">
+                <option value="PEN">S/ PEN</option>
+                <option value="USD">$ USD</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="fx-cuenta">Cuenta</label>
+              <select id="fx-cuenta"><!-- Se pobla desde app.js --></select>
+            </div>
+            <div>
+              <label for="fx-medio">Medio de pago</label>
+              <select id="fx-medio">
+                <option>Inversión</option>
+                <option>Efectivo</option>
+                <option>Transferencia</option>
+                <option>Tarjeta</option>
+                <option>Yape/Plin</option>
+                <option>Cheque</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="fx-tercero">Cliente / Proveedor (opcional)</label>
+              <input id="fx-tercero" type="text" placeholder="Ej. Limpio Total S.A.C. / Proveedor ABC" />
+            </div>
+            <div>
+              <label for="fx-monto">Monto</label>
+              <input id="fx-monto" type="number" min="0" step="0.01" placeholder="0.00" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="fx-glosa">Glosa</label>
+              <input id="fx-glosa" type="text" placeholder="Descripción breve de la operación" />
+            </div>
+          </div>
+
+          <!-- Vinculación dinámica -->
+          <!-- Bloque: Vincular a venta (solo para Ingreso) -->
+          <div id="blk-vinc-venta" class="card" style="margin-top:12px">
+            <h3>Vincular a venta (opcional)</h3>
+            <div class="row">
+              <div class="grow">
+                <label for="fx-venta">Venta</label>
+                <select id="fx-venta">
+                  <option value="">(Sin vincular)</option>
+                  <!-- Ventas pendientes/facturadas se poblan desde app.js -->
+                </select>
+              </div>
+              <div>
+                <label>&nbsp;</label>
+                <button type="button" class="btn mid" id="fx-btn-validar-venta">Validar</button>
+              </div>
+            </div>
+            <div id="fx-validacion-venta" class="alert" style="display:none; margin-top:6px"></div>
+          </div>
+
+          <!-- Bloque: Vincular a ingreso (solo para Gasto) -->
+          <div id="blk-vinc-ingreso" class="card" style="margin-top:12px; display:none">
+            <h3>Vincular a ingreso (opcional)</h3>
+            <div class="row">
+              <div class="grow">
+                <label for="fx-ingreso">Ingreso</label>
+                <select id="fx-ingreso">
+                  <option value="">(Sin vincular)</option>
+                  <!-- Ingresos (p.ej. PR-00XX / EG-2025-XXXX) se poblan desde app.js -->
+                </select>
+              </div>
+              <div>
+                <label>&nbsp;</label>
+                <button type="button" class="btn mid" id="fx-btn-validar-ingreso">Validar</button>
+              </div>
+            </div>
+            <div id="fx-validacion-ingreso" class="alert" style="display:none; margin-top:6px"></div>
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div>
+          <h2>Comprobante (CPE)</h2>
+          <div class="row">
+            <div>
+              <label for="fx-comp-tipo">Tipo</label>
+              <select id="fx-comp-tipo">
+                <option>Factura</option>
+                <option>Boleta</option>
+                <option>Nota de crédito</option>
+                <option>Nota de débito</option>
+              </select>
+            </div>
+            <div>
+              <label for="fx-comp-serie">Serie</label>
+              <input id="fx-comp-serie" type="text" placeholder="F001 / B001" />
+            </div>
+            <div>
+              <label for="fx-comp-numero">Número</label>
+              <input id="fx-comp-numero" type="number" min="1" max="99999999" placeholder="00000001" />
+            </div>
+          </div>
+
+          <p class="small muted">
+            La serie y numeración deben seguir la correlatividad del sistema y el tipo de CPE
+            (Factura/Boleta/notas). El total puede considerar IGV 18% cuando aplique.
+          </p>
+
+          <div class="row" style="margin-top:8px">
+            <button class="btn" type="submit">Registrar Transacción</button>
+            <button class="btn mid" type="reset">Limpiar</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Resumen de la última transacción registrada -->
+      <div id="resumen" class="card" style="margin-top:18px; display:none">
+        <!-- Se renderiza tras registrar -->
+      </div>
+
+      <p class="small muted" style="margin-top:10px">
+        Nota: para operaciones de alto valor, recuerda el uso de <b>medios de pago</b> bancarizados según normativa vigente.
+      </p>
+    </section>
+
+    <hr />
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Registrar Transaccion"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Finanzas -->
+  <script src="app.js"></script>
+
+  <!-- Script mínimo para alternar bloques de vinculación según Tipo -->
+  <script>
+    (function () {
+      const tipo = document.getElementById('fx-tipo');
+      const blkVenta = document.getElementById('blk-vinc-venta');
+      const blkIngreso = document.getElementById('blk-vinc-ingreso');
+
+      function toggleVinculacion() {
+        const isIngreso = (tipo.value === 'Ingreso');
+        blkVenta.style.display  = isIngreso ? '' : 'none';
+        blkIngreso.style.display = isIngreso ? 'none' : '';
+      }
+
+      // Inicializar al cargar
+      toggleVinculacion();
+
+      // Escuchar cambios
+      tipo.addEventListener('change', toggleVinculacion);
+
+      // Opcional: prevenir que "Validar" envíe el formulario
+      const btnValVenta = document.getElementById('fx-btn-validar-venta');
+      const btnValIngreso = document.getElementById('fx-btn-validar-ingreso');
+      if (btnValVenta) btnValVenta.addEventListener('click', () => {
+        const box = document.getElementById('fx-validacion-venta');
+        box.textContent = 'Validación de venta OK (demo).';
+        box.style.display = '';
+      });
+      if (btnValIngreso) btnValIngreso.addEventListener('click', () => {
+        const box = document.getElementById('fx-validacion-ingreso');
+        box.textContent = 'Validación de ingreso OK (demo).';
+        box.style.display = '';
+      });
+    })();
+  </script>
+</body>
+</html>

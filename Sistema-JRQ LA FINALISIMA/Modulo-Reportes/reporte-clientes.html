@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reporte de Clientes · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Reportes"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Reportes">
+      <div class="row" style="flex-wrap:wrap;gap:10px">
+        <a class="btn mid" href="reporte-personal.html">Reporte de Personal</a>
+        <a class="btn" href="reporte-clientes.html" aria-current="page">Reporte de Clientes</a>
+        <a class="btn mid" href="reporte-produccion.html">Reporte de Producción</a>
+        <a class="btn mid" href="reporte-inventario.html">Reporte de Inventario</a>
+        <a class="btn mid" href="reporte-estado-cuentas.html">Reporte de Estado de Cuentas</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Generar Reporte de Clientes</h1>
+
+      <div class="grid cols-2">
+        <!-- Filtros (leídos/llenados por app-rep.js) -->
+        <form id="rc-filtros" class="card" role="form" aria-labelledby="rc-filtros-titulo" autocomplete="off">
+          <h2 id="rc-filtros-titulo">Filtros</h2>
+
+          <div class="row">
+            <div>
+              <label for="rc-desde">Desde</label>
+              <input id="rc-desde" type="date" />
+            </div>
+            <div>
+              <label for="rc-hasta">Hasta</label>
+              <input id="rc-hasta" type="date" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="rc-tipo">Tipo</label>
+              <select id="rc-tipo">
+                <option value="">(Todos)</option>
+                <!-- opciones dinámicas -->
+              </select>
+            </div>
+            <div>
+              <label for="rc-estado">Estado</label>
+              <select id="rc-estado">
+                <option value="">(Todos)</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="rc-q">Nombre o DNI/RUC</label>
+              <input id="rc-q" type="text" placeholder="Ej. Ferretería El Progreso o 2060..." />
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn" type="submit">Aplicar Filtros</button>
+            <button class="btn mid" type="reset">Limpiar</button>
+          </div>
+
+          <p class="small muted">
+            Ajusta el período, filtra por <b>tipo</b> y <b>estado</b>, o busca por <b>nombre</b> y <b>documento</b>.
+          </p>
+        </form>
+
+        <!-- Resumen / KPIs (actualizado por app-rep.js) -->
+        <aside class="card" id="rc-resumen" aria-live="polite">
+          <h2>Resumen</h2>
+          <div class="grid cols-2">
+            <div class="kpi">
+              <div class="kpi-title">Total clientes</div>
+              <div class="kpi-value" id="rc-kpi-total">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Activos</div>
+              <div class="kpi-value" id="rc-kpi-activos">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Inactivos</div>
+              <div class="kpi-value" id="rc-kpi-inactivos">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Tipos</div>
+              <div class="kpi-value" id="rc-kpi-tipos">—</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Resultados -->
+      <div class="card" style="margin-top:12px">
+        <h2>Resultados</h2>
+
+        <table class="table" id="rc-tabla" aria-describedby="rc-ayuda">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre/Razón social</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="rc-body"><!-- filas dinámicas --></tbody>
+          <tfoot id="rc-foot"><!-- totales/subtotales --></tfoot>
+        </table>
+
+        <div id="rc-empty" class="alert" style="display:none">
+          No hay resultados con los filtros aplicados.
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn mid" id="rc-exp-pdf" type="button">Exportar PDF</button>
+          <button class="btn mid" id="rc-exp-xls" type="button">Exportar Excel</button>
+        </div>
+
+        <p id="rc-ayuda" class="small muted">Los resultados se generan según los filtros y la búsqueda aplicada.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Reporte de Clientes"></jrq-footer>
+
+  <!-- Toast global -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- JS del módulo Reportes -->
+  <script src="app-rep.js" defer></script>
+</body>
+</html>

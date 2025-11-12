@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar venta · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Ventas"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Ventas -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Ventas">
+      <div class="row" style="align-items:center">
+        <a class="btn" href="(p) registrar-venta.html" aria-current="page">Registrar Venta</a>
+        <a class="btn mid" href="mostrar-ventas.html">Mostrar Ventas</a>
+        <a class="btn mid" href="modificar-venta.html">Modificar Venta</a>
+        <a class="btn mid" href="cancelar-venta.html">Cancelar venta</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Registrar Venta</h1>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h2>Datos</h2>
+          <form id="rv-form" autocomplete="off">
+            <div class="row">
+              <div>
+                <label for="rv-cliente">Cliente</label>
+                <select id="rv-cliente"></select>
+              </div>
+              <div>
+                <label for="rv-pago">Forma de pago</label>
+                <select id="rv-pago"></select>
+              </div>
+            </div>
+
+            <h2>Items</h2>
+            <table class="table" aria-describedby="rv-help">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="rv-items"><!-- filas dinámicas --></tbody>
+            </table>
+            <div class="row">
+              <button type="button" id="rv-add" class="btn mid">Agregar producto</button>
+            </div>
+
+            <div class="row">
+              <div class="card" style="flex:1">
+                <div class="row">
+                  <div><label>Subtotal</label><div id="rv-subtotal">S/ 0.00</div></div>
+                  <div><label>IGV (18%)</label><div id="rv-igv">S/ 0.00</div></div>
+                  <div><label>Total</label><div id="rv-total"><b>S/ 0.00</b></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones: enviar y navegar -->
+            <div class="row" style="gap:10px; flex-wrap:wrap">
+              <button class="btn" type="submit">Registrar Venta</button>
+
+              <!-- Navegación a otras pantallas como enlaces -->
+              <a class="btn" href="../Modulo-Produccion/(p) validar-orden.html">
+                Validar Orden de Producción Vinculada
+              </a>
+              <a class="btn" href="../Modulo-Finanzas/(p) registrar-transaccion.html">
+                Registrar Nueva Transferencia Vinculada
+              </a>
+            </div>
+
+            <p id="rv-help" class="small">
+              Se valida stock y se calcula IGV/total automáticamente.
+            </p>
+          </form>
+        </div>
+
+        <aside class="card">
+          <h2>Guía</h2>
+          <p>Los precios unitarios son netos; el sistema calcula <b>IGV 18%</b> y Total.</p>
+          <p>Estados del pedido:
+            <span class="tag">Registrada</span> →
+            <span class="tag">Confirmada</span> →
+            <span class="tag">Facturada</span> →
+            <span class="tag">Preparada</span> →
+            <span class="tag">Despachada</span> →
+            <span class="tag">Entregada</span>.
+          </p>
+        </aside>
+      </div>
+
+      <!-- Resumen de la última venta registrada -->
+      <section class="card" id="resumen" style="margin-top:18px; display:none">
+        <h2>Resumen de la última venta registrada</h2>
+
+        <div class="grid cols-2">
+          <div class="row">
+            <div>
+              <label>Venta</label>
+              <div id="rs-venta">—</div>
+            </div>
+            <div>
+              <label>Fecha y hora</label>
+              <div id="rs-fecha">—</div>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Cliente</label>
+              <div id="rs-cliente">—</div>
+            </div>
+            <div>
+              <label>Forma de pago</label>
+              <div id="rs-pago">—</div>
+            </div>
+          </div>
+        </div>
+
+        <table class="table" style="margin-top:10px">
+          <thead>
+            <tr><th>Producto</th><th>Cant.</th><th>P. Unit.</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody id="rs-items"><!-- items de la venta --></tbody>
+          <tfoot>
+            <tr><th colspan="3" style="text-align:right">Subtotal</th><td id="rs-subtotal">S/ 0.00</td></tr>
+            <tr><th colspan="3" style="text-align:right">IGV (18%)</th><td id="rs-igv">S/ 0.00</td></tr>
+            <tr><th colspan="3" style="text-align:right">Total</th><td id="rs-total"><b>S/ 0.00</b></td></tr>
+          </tfoot>
+        </table>
+      </section>
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Registrar venta"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- JS del módulo Ventas -->
+  <script src="app-ventas.js"></script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar producto · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <jrq-header prefix="../" active="Inventario"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación Inventario">
+      <div class="row" style="align-items:center">
+        <a class="btn" href="(p) registrar-producto.html" aria-current="page">Registrar Producto</a>
+        <a class="btn mid" href="stock-producto.html">Mostrar Productos</a>
+        <a class="btn mid" href="modificar-producto.html">Modificar Producto</a>
+        <a class="btn mid" href="baja-producto.html">Dar de Baja un Producto</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Registrar Producto (Ingreso)</h1>
+
+      <form id="eg-form" autocomplete="off" class="grid cols-2">
+        <!-- Columna izquierda -->
+        <div>
+          <div class="row">
+            <div>
+              <label for="eg-tipo">Tipo</label>
+              <select id="eg-tipo">
+                <option value="insumo">Insumo</option>
+                <option value="producto">Producto Fabricado</option>
+              </select>
+            </div>
+            <div>
+              <label for="eg-fecha">Fecha</label>
+              <input id="eg-fecha" type="date" />
+            </div>
+            <div>
+              <label for="eg-resp">Responsable</label>
+              <select id="eg-resp"></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="eg-obs">Observación</label>
+              <input id="eg-obs" type="text" placeholder="Opcional: guía, lote, proveedor..." />
+            </div>
+          </div>
+
+          <!-- Items -->
+          <h2 style="margin-top:10px">Items</h2>
+          <table class="table" aria-describedby="eg-help">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Costo</th>
+                <th>Stock</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="eg-items"><!-- filas dinámicas --></tbody>
+          </table>
+
+          <div class="row">
+            <button type="button" id="eg-add" class="btn mid">Agregar producto</button>
+          </div>
+
+          <div class="row">
+            <div class="card" style="flex:1">
+              <div class="row">
+                <div><label>Subtotal</label><div id="eg-subtotal">S/ 0.00</div></div>
+                <div><label>IGV (18%)</label><div id="eg-igv">S/ 0.00</div></div>
+                <div><label>Total</label><div id="eg-total"><b>S/ 0.00</b></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px; gap:10px; flex-wrap:wrap">
+            <button class="btn" type="submit">Registrar Ingreso</button>
+            <a class="btn" href="../Modulo-Finanzas/(p) registrar-transaccion.html">Registrar Nueva Transferencia Vinculada</a>
+            
+          </div>
+
+          <p id="eg-help" class="small muted">
+            Se calcula IGV/Total automáticamente. Al registrar, se simula aumentar el stock y se guarda el ingreso en localStorage.
+          </p>
+        </div>
+
+        <!-- Columna derecha -->
+        <aside class="card">
+          <h2>Notas</h2>
+          <p>El combo <b>Producto</b> cambia según el <b>Tipo</b> elegido.</p>
+          <p>El campo <b>Stock</b> refleja el stock previo (demo).</p>
+          <p>Formato de moneda con API Intl.NumberFormat.</p>
+        </aside>
+      </form>
+    </section>
+
+    <!-- Resumen del último registro (oculto) -->
+    <section id="eg-last" class="card" hidden style="margin-top:14px">
+      <h2>Resumen del último registro</h2>
+      <div class="grid cols-2">
+        <div><label>Código</label><div id="eg-last-codigo">—</div></div>
+        <div><label>Tipo</label><div id="eg-last-tipo">—</div></div>
+        <div><label>Responsable</label><div id="eg-last-resp">—</div></div>
+        <div><label>Total</label><div id="eg-last-total">—</div></div>
+        <div><label>Fecha</label><div id="eg-last-fecha">—</div></div>
+        <div><label>Estado</label><div id="eg-last-estado">—</div></div>
+      </div>
+      <p class="small muted">Vista rápida del último ingreso registrado (demo localStorage).</p>
+    </section>
+  </main>
+
+  <jrq-footer context="Registrar Ingreso"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Script embebido -->
+  <script>
+  (() => {
+    // ====== Configuración ======
+    const IGV_RATE = 0.18;
+    const CATALOGO_VERSION = "productos.v2"; // <- incrementa para forzar actualización
+
+    // Catálogo ordenado y normalizado
+    const CATALOGO = [
+      // Insumos
+      { id: 'PR-0001', nombre: 'PR-0001. Ácido cítrico',        tipo: 'insumo',   costo: 12.50, stock:  80 },
+      { id: 'PR-0002', nombre: 'PR-0002. Peróxido técnico',     tipo: 'insumo',   costo:  9.10, stock: 120 },
+      { id: 'PR-0003', nombre: 'PR-0003. Envase PET 1L',        tipo: 'insumo',   costo:  1.30, stock: 500 },
+      { id: 'PR-0004', nombre: 'PR-0004. Hipoclorito 5%',       tipo: 'insumo',   costo:  5.50, stock: 120 },
+      { id: 'PR-0005', nombre: 'PR-0005. Tensoactivo X',        tipo: 'insumo',   costo: 18.00, stock:  70 },
+      { id: 'PR-0006', nombre: 'PR-0006. Fragancia Floral',     tipo: 'insumo',   costo: 41.50, stock:  15 },
+      { id: 'PR-0007', nombre: 'PR-0007. Envase PET 1L',        tipo: 'insumo',   costo:  0.78, stock: 800 },
+
+      // Productos terminados
+      { id: 'PR-0101', nombre: 'PR-0101. Detergente Multiusos 1L', tipo: 'producto', costo:  7.80, stock:  60 },
+      { id: 'PR-0102', nombre: 'PR-0102. Lejía 5% 1L',              tipo: 'producto', costo:  5.40, stock:  75 },
+      { id: 'PR-0103', nombre: 'PR-0103. Detergente 1L',            tipo: 'producto', costo: 11.90, stock: 200 },
+      { id: 'PR-0104', nombre: 'PR-0104. Lavavajilla 500ml',        tipo: 'producto', costo:  3.50, stock: 180 },
+      { id: 'PR-0105', nombre: 'PR-0105. Limpiavidrios 500',        tipo: 'producto', costo:  4.10, stock: 140 }
+    ];
+
+    // ====== Utilidades ======
+    const qs  = (s, el=document) => el.querySelector(s);
+    const qsa = (s, el=document) => [...el.querySelectorAll(s)];
+    const PEN = new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" });
+    const fmtMoney = v => PEN.format(Number.isFinite(+v) ? +v : 0);
+
+    const storage = {
+      get(k, fb){ try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } },
+      set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+    };
+
+    // ====== Seed + Catálogo con versión (arregla el problema del combo) ======
+    function seedOnce(){
+      const today = new Date().toISOString().slice(0,10);
+
+      // Empleados
+      if (!storage.get('empleados')) {
+        storage.set('empleados', [
+          { id: 'T-0001', nombre: 'María Rojas' },
+          { id: 'T-0002', nombre: 'Carlos Díaz' },
+          { id: 'T-0003', nombre: 'Ana Gómez' },
+        ]);
+      }
+      if (!storage.get('ingresos')) storage.set('ingresos', []);
+
+      // Catálogo: forzamos si no existe o si la versión cambió
+      const currentVer = storage.get('catalogo_version');
+      if (!storage.get('productos') || currentVer !== CATALOGO_VERSION) {
+        storage.set('productos', CATALOGO);
+        storage.set('catalogo_version', CATALOGO_VERSION);
+      }
+
+      // Fecha por defecto
+      const egFecha = qs('#eg-fecha');
+      if (egFecha && !egFecha.value) egFecha.value = today;
+    }
+
+    // ====== Catálogos ======
+    const getEmpleados  = () => storage.get('empleados', []);
+    const getProductos  = () => storage.get('productos', []);
+    const saveProductos = (arr) => storage.set('productos', arr);
+
+    // ====== Código incremental ======
+    function generarCodigoTX(){
+      const anio = new Date().getFullYear();
+      const base = storage.get('ingresos', []);
+      const sec  = base.length + 1;
+      return `TX-${anio}-${String(sec).padStart(4,'0')}`;
+    }
+
+    // ====== UI: Toast ======
+    function toast(msg){
+      const el = qs('#toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'), 2400);
+    }
+
+    // ====== Render responsables ======
+    function renderResponsables(){
+      const sel = qs('#eg-resp');
+      if (!sel) return;
+      sel.innerHTML = '';
+      getEmpleados().forEach(e=>{
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = `${e.nombre} (${e.id})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    // ====== Productos por tipo ======
+    function productosPorTipo(tipo){
+      // Ordenamos por ID para que siempre se vea completo/estable
+      return getProductos()
+        .filter(p => p.tipo === tipo)
+        .sort((a,b) => a.id.localeCompare(b.id));
+    }
+
+    function crearSelectProducto(tipo){
+      const sel = document.createElement('select');
+      sel.className = 'eg-prod';
+      productosPorTipo(tipo).forEach(p=>{
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        // Se muestra el nombre ya normalizado "PR-XXXX. Nombre"
+        opt.textContent = p.nombre;
+        sel.appendChild(opt);
+      });
+      return sel;
+    }
+
+    // ====== Fila dinámica ======
+    function nuevaFila(tipoActual){
+      const tr = document.createElement('tr');
+
+      // Producto
+      const tdProd = document.createElement('td');
+      const selProd = crearSelectProducto(tipoActual);
+      tdProd.appendChild(selProd);
+
+      // Costo
+      const tdCosto = document.createElement('td');
+      const inCosto = document.createElement('input');
+      inCosto.type = 'number'; inCosto.min = '0'; inCosto.step = '0.01';
+      inCosto.className = 'eg-costo';
+      tdCosto.appendChild(inCosto);
+
+      // Stock (solo lectura)
+      const tdStock = document.createElement('td');
+      const inStock = document.createElement('input');
+      inStock.type = 'number'; inStock.readOnly = true; inStock.className = 'eg-stock';
+      tdStock.appendChild(inStock);
+
+      // Cantidad
+      const tdCant = document.createElement('td');
+      const inCant = document.createElement('input');
+      inCant.type = 'number'; inCant.min = '0'; inCant.step = '0.01';
+      inCant.className = 'eg-cant';
+      tdCant.appendChild(inCant);
+
+      // Subtotal (solo lectura visual)
+      const tdSub = document.createElement('td');
+      const outSub = document.createElement('div');
+      outSub.className = 'eg-subout'; outSub.textContent = fmtMoney(0);
+      tdSub.appendChild(outSub);
+
+      // Acción (Quitar)
+      const tdAcc = document.createElement('td');
+      const btnDel = document.createElement('button');
+      btnDel.type = 'button'; btnDel.className = 'btn danger';
+      btnDel.textContent = 'Quitar';
+      tdAcc.appendChild(btnDel);
+
+      function syncByProduct(){
+        const prod = getProductos().find(p=>p.id === selProd.value);
+        if (!prod) return;
+        inCosto.value = prod.costo;
+        inStock.value = prod.stock;
+        if (!inCant.value) inCant.value = 1;
+        recalcRow();
+      }
+
+      function recalcRow(){
+        const costo = parseFloat(inCosto.value) || 0;
+        const cant  = parseFloat(inCant.value)  || 0;
+        const sub = costo * cant;
+        outSub.textContent = fmtMoney(sub);
+        recalcTotals();
+      }
+
+      selProd.addEventListener('change', syncByProduct);
+      inCosto.addEventListener('input', recalcRow);
+      inCant.addEventListener('input', recalcRow);
+      btnDel.addEventListener('click', ()=>{ tr.remove(); recalcTotals(); });
+
+      tr.append(tdProd, tdCosto, tdStock, tdCant, tdSub, tdAcc);
+
+      // Inicializar con el primer producto del tipo
+      setTimeout(syncByProduct);
+      return tr;
+    }
+
+    // ====== Totales ======
+    function recalcTotals(){
+      const rows = qsa('#eg-items tr');
+      let subtotal = 0;
+      rows.forEach(r=>{
+        const costo = parseFloat(qs('.eg-costo', r).value) || 0;
+        const cant  = parseFloat(qs('.eg-cant', r).value)  || 0;
+        subtotal += costo * cant;
+      });
+      const igv = +(subtotal * IGV_RATE).toFixed(2);
+      const total = subtotal + igv;
+
+      qs('#eg-subtotal').textContent = fmtMoney(subtotal);
+      qs('#eg-igv').textContent = fmtMoney(igv);
+      qs('#eg-total').innerHTML = `<b>${fmtMoney(total)}</b>`;
+      return { subtotal, igv, total };
+    }
+
+    // ====== Tipo cambia -> limpiar items ======
+    function refreshProductsInRows(){
+      qsa('#eg-items tr').forEach(tr=>tr.remove());
+      recalcTotals();
+    }
+
+    // ====== Guardar ingreso ======
+    function guardarIngreso(evt){
+      evt.preventDefault();
+      const tipo   = qs('#eg-tipo').value;
+      const fecha  = qs('#eg-fecha').value;
+      const respId = qs('#eg-resp').value;
+      const obs    = qs('#eg-obs').value.trim();
+
+      const rows = qsa('#eg-items tr');
+      if (rows.length === 0){ toast('Agrega al menos un producto.'); return; }
+
+      const items = rows.map(r=>{
+        const prodId = qs('.eg-prod', r).value;
+        const costo  = parseFloat(qs('.eg-costo', r).value) || 0;
+        const cant   = parseFloat(qs('.eg-cant', r).value)  || 0;
+        return { prodId, costo, cant };
+      });
+
+      const { subtotal, igv, total } = recalcTotals();
+      const codigo = generarCodigoTX();
+      const ingreso = { codigo, tipo, fecha, respId, obs, items, subtotal, igv, total, estado: 'Registrado' };
+
+      // Persistir
+      const ingresos = storage.get('ingresos', []);
+      ingresos.push(ingreso);
+      storage.set('ingresos', ingresos);
+
+      // Aumentar stock
+      const productos = getProductos();
+      items.forEach(it=>{
+        const p = productos.find(pp=>pp.id === it.prodId);
+        if (p) p.stock = +(Number(p.stock) + Number(it.cant)).toFixed(2);
+      });
+      saveProductos(productos);
+
+      // Resumen + limpiar
+      pintarResumen(ingreso);
+      refreshProductsInRows();
+      toast(`Ingreso ${codigo} registrado`);
+    }
+
+    // ====== Resumen ======
+    function pintarResumen(ing){
+      const wrap = qs('#eg-last');
+      if (!wrap) return;
+      wrap.hidden = false;
+
+      const emp = getEmpleados().find(e=>e.id === ing.respId);
+      const respNombre = emp ? emp.nombre : ing.respId;
+
+      qs('#eg-last-codigo').textContent = ing.codigo;
+      qs('#eg-last-tipo').textContent   = ing.tipo;
+      qs('#eg-last-resp').textContent   = `${respNombre} (${ing.respId})`;
+      qs('#eg-last-total').textContent  = fmtMoney(ing.total);
+      qs('#eg-last-fecha').textContent  = ing.fecha || '-';
+      qs('#eg-last-estado').textContent = ing.estado || 'Registrado';
+    }
+
+    // ====== Limpiar ======
+    function limpiarForm(){
+      refreshProductsInRows();
+      qs('#eg-obs').value = '';
+    }
+
+    // ====== Init ======
+    function init(){
+      seedOnce();
+      renderResponsables();
+
+      const selTipo = qs('#eg-tipo');
+      selTipo.addEventListener('change', refreshProductsInRows);
+
+      qs('#eg-add').addEventListener('click', ()=>{
+        const tipo = qs('#eg-tipo').value;
+        const tbody = qs('#eg-items');
+        tbody.appendChild(nuevaFila(tipo));
+        recalcTotals();
+      });
+
+      qs('#eg-form').addEventListener('submit', guardarIngreso);
+      qs('#eg-clear').addEventListener('click', limpiarForm);
+
+      recalcTotals();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  })();
+  </script>
+</body>
+</html>

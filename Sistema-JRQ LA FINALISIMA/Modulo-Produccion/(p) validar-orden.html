@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title> OP · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Producción"></jrq-header>
+
+  <main class="container" role="main">
+    <!-- Botonera del módulo -->
+    <section class="card" aria-label="Navegación del módulo Producción" style="margin-top:18px">
+      <div class="row" style="align-items:center">
+
+        <a class="btn" href="(p) validar-orden.html">Validar OP</a>
+        <a class="btn mid" href="asignar-recursos.html">Asignar Recursos</a>
+        <a class="btn mid" href="actualizar-estado.html">Actualizar Estado</a>
+        <a class="btn mid" href="monitorear-orden.html">Monitorear Orden</a>
+
+      </div>
+    </section>
+
+    <h1 style="margin-top:18px">Validar Orden de Producción</h1>
+
+    <section class="tab" id="tab-registrar" style="display:block">
+      <div class="grid cols-2">
+        <div class="card">
+          <h2>Datos de la OP</h2>
+          <form id="frm">
+            <div class="row">
+              <div class="grow">
+            <label for="av-q">Venta Vinculada</label>
+            <input id="av-q" type="text" placeholder="VENTA VINCULADA A LA ORDEN DE PRODUCCION/VTA-2025-00XX">
+          </div>
+              <div class="grow">
+                <label for="prod">Producto</label>
+                <select id="prod"></select>
+              </div>
+              <div>
+                <label for="qty">Cantidad (unidades)</label>
+                <input id="qty" type="number" min="1" value="100">
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="ini">Fecha de inicio</label>
+                <input id="ini" type="date">
+              </div>
+              <div>
+                <label for="fin">Fecha de fin</label>
+                <input id="fin" type="date">
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="btn" type="submit">Validar OP</button>
+              <button class="btn mid" type="reset" onclick="location.reload()">Limpiar</button>
+            </div>
+
+            <p class="small muted">
+              *Se valida disponibilidad de insumos (BOM × cantidad) con <b>reservas</b>.
+              Código automático (p.ej. OP-2025-0004).
+            </p>
+            <p class="small muted">
+              *La validación de la orden de produccion se genera cuando realiza una VENTA
+            </p>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Disponibilidad de Insumos</h2>
+          <div id="avail" class="alert">—</div>
+          <table class="table" id="tbl-req">
+            <thead>
+              <tr>
+                <th>Insumo</th>
+                <th>Especificación / unidad</th>
+                <th>Requerido</th>
+                <th>Stock</th>
+                <th>Reservado</th>
+                <th>Disponible</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Resumen de la última OP registrada -->
+      <div id="resumen" style="margin-top:18px"></div>
+    </section>
+
+    <section class="tab" id="tab-recursos" style="display:none"></section>
+    <section class="tab" id="tab-avance"   style="display:none"></section>
+    <section class="tab" id="tab-calidad"  style="display:none"></section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Validar OP"></jrq-footer>
+
+  <!-- JS del módulo -->
+  <script src="app-prod.js"></script>
+</body>
+</html>
+

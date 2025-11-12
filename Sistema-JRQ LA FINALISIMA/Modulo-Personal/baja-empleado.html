@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Eliminar/Inactivar trabajador · JR Químicos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global (no repetir markup en cada página) -->
+  <jrq-header prefix="../" active="Personal"></jrq-header>
+
+  <main class="container" role="main">
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Personal">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) registrar-empleado.html" aria-current="page">Registrar Empleado</a>
+        <a class="btn mid" href="mostrar-empleado.html">Mostrar Empleado</a>
+        <a class="btn mid" href="modificar-empleado.html">Modificar Empleado</a>
+        <a class="btn" href="baja-empleado.html">Dar de Baja a un Empleado</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h1>Eliminar / Inactivar Trabajador</h1>
+
+      <!-- Buscar -->
+      <div class="card">
+        <h2>Buscar</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="et-q">Por DNI o nombre</label>
+            <input id="et-q" type="text" placeholder="65432109 o 'Ana'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado con botón rojo único “Seleccionar” -->
+      <div class="card">
+        <h2>Listado</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>DNI</th>
+              <th>Área</th>
+              <th>Cargo</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="et-body"><!-- filas dinámicas --></tbody>
+        </table>
+
+        <div id="et-empty" class="alert" style="display:none">No hay trabajadores para mostrar.</div>
+
+        <p class="small muted">
+          Si el trabajador tiene vínculos activos (p. ej., OP asignadas), se marcará como <b>Inactivo</b> en lugar de eliminarse.
+        </p>
+
+        <!-- Plantilla estándar de fila (un solo botón rojo “Seleccionar”) -->
+        <template id="tpl-et-row">
+          <tr>
+            <td data-col="cod"></td>
+            <td data-col="nom"></td>
+            <td data-col="dni"></td>
+            <td data-col="area"></td>
+            <td data-col="cargo"></td>
+            <td data-col="estado"></td>
+            <td data-col="accion">
+              <button class="btn danger et-select"
+                      data-cod=""
+                      data-dni=""
+                      data-nom=""
+                      data-estado="">
+                Seleccionar
+              </button>
+            </td>
+          </tr>
+        </template>
+      </div>
+
+      <!-- Formulario de confirmación con dos botones (rojo + vecino) -->
+      <div class="card">
+        <h2>Confirmación</h2>
+        <form id="et-form" autocomplete="off">
+          <div class="grid cols-2">
+            <div>
+              <label for="et-cod">Código</label>
+              <input id="et-cod" type="text" readonly>
+            </div>
+            <div>
+              <label for="et-dni">DNI</label>
+              <input id="et-dni" type="text" readonly>
+            </div>
+            <div class="grow">
+              <label for="et-nom">Nombre</label>
+              <input id="et-nom" type="text" readonly>
+            </div>
+            <div>
+              <label for="et-est">Estado actual</label>
+              <input id="et-est" type="text" readonly>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow">
+              <label for="et-motivo">Motivo</label>
+              <input id="et-motivo" type="text" placeholder="Ej. término de contrato / duplicidad / disciplina">
+            </div>
+          </div>
+
+          <!-- Botonera estándar -->
+          <div class="row" style="gap:8px; align-items:end">
+            <button class="btn danger" type="submit" id="et-baja">Dar de Baja al Empleado</button>
+            <button class="btn mid" type="button" id="et-inactivar">Marcar como Inactivo</button>
+          </div>
+
+          <p class="small muted">Se solicitará confirmación antes de ejecutar.</p>
+        </form>
+      </div>
+
+      <hr />
+    </section>
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Eliminar Trabajador"></jrq-footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

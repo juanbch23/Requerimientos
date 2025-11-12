@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cancelar transacción · JR Químicos</title>
+  <!-- CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- Header/Footer globales -->
+  <script type="module" src="../ui/shell.js"></script>
+</head>
+<body>
+  <!-- Header global -->
+  <jrq-header prefix="../" active="Finanzas"></jrq-header> 
+
+  <main class="container" role="main">
+    <!-- Botonera local del módulo Finanzas -->
+    <section class="card" style="margin-top:18px" aria-label="Navegación del módulo Finanzas">
+      <div class="row" style="align-items:center">
+        <a class="btn mid" href="(p) registrar-transaccion.html">Registrar Transacción</a>
+        <a class="btn mid" href="consultar-cuenta.html">Estados de Cuenta</a>
+        <a class="btn" href="cancelar-transaccion.html" aria-current="page">Cancelar Transacción</a>
+      </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="card" style="margin-top:18px">
+      <h1>Cancelar Transacción</h1>
+      <form id="del-filtros" class="row" autocomplete="off" aria-label="Filtros de búsqueda">
+        <div>
+          <label for="del-id">ID / Ref.</label>
+          <input id="del-id" type="text" placeholder="Ej. FX-2025-0042" />
+        </div>
+        <div>
+          <label for="del-desde">Desde</label>
+          <input id="del-desde" type="date" />
+        </div>
+        <div>
+          <label for="del-hasta">Hasta</label>
+          <input id="del-hasta" type="date" />
+        </div>
+        <div>
+          <label for="del-tipo">Tipo</label>
+          <select id="del-tipo">
+            <option value="">(Todos)</option>
+            <option>Ingreso</option>
+            <option>Gasto</option>
+          </select>
+        </div>
+        <div class="grow">
+          <label for="del-cuenta">Cuenta</label>
+          <select id="del-cuenta">
+            <option value="">(Todas)</option>
+          </select>
+        </div>
+        <div style="flex:0 0 auto; align-self:end">
+          <button class="btn" type="submit">Buscar</button>
+          <button class="btn mid" type="reset">Limpiar</button>
+        </div>
+      </form>
+      <p class="small muted" style="margin-top:6px">
+        No se permite cancelar transacciones <b>conciliadas</b> o con CPE asociado; use <b>Anulación</b> cuando corresponda.
+      </p>
+    </section>
+
+    <!-- Resultados (formato dar de baja) -->
+    <section class="card" style="margin-top:12px">
+      <h2>Resultados</h2>
+      <table class="table" aria-describedby="del-ayuda">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Cuenta</th>
+            <th>Moneda</th>
+            <th class="right">Monto</th>
+            <th>Comprobante</th>
+            <th>Conciliado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="del-body"></tbody>
+      </table>
+      <div id="del-empty" class="alert" style="display:none">No hay transacciones para los filtros aplicados.</div>
+      <p id="del-ayuda" class="small muted" style="margin-top:10px">
+        Usa el botón <b>Seleccionar</b> para cargar el registro en el formulario de confirmación.
+      </p>
+
+      <!-- Plantilla para filas -->
+      <template id="tpl-del-row">
+        <tr>
+          <td data-col="id"></td>
+          <td data-col="fecha"></td>
+          <td data-col="tipo"></td>
+          <td data-col="cuenta"></td>
+          <td data-col="moneda"></td>
+          <td data-col="monto" class="right"></td>
+          <td data-col="cpe"></td>
+          <td data-col="conc"></td>
+          <td data-col="accion">
+            <button class="btn danger del-select"
+                    data-id=""
+                    data-fecha=""
+                    data-tipo=""
+                    data-cuenta=""
+                    data-moneda=""
+                    data-monto=""
+                    data-cpe=""
+                    data-conciliado=""
+                    data-glosa="">
+              Seleccionar
+            </button>
+          </td>
+        </tr>
+      </template>
+    </section>
+
+    <!-- Confirmación -->
+    <section class="card" style="margin-top:12px">
+      <h2>Confirmación</h2>
+      <form id="del-form" class="grid cols-2" autocomplete="off" aria-label="Confirmación de cancelación">
+        <div>
+          <div class="row">
+            <div>
+              <label for="del-sel-id">ID</label>
+              <input id="del-sel-id" type="text" readonly />
+            </div>
+            <div>
+              <label for="del-sel-fecha">Fecha</label>
+              <input id="del-sel-fecha" type="date" readonly />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="del-sel-tipo">Tipo</label>
+              <input id="del-sel-tipo" type="text" readonly />
+            </div>
+            <div class="grow">
+              <label for="del-sel-cuenta">Cuenta</label>
+              <input id="del-sel-cuenta" type="text" readonly />
+            </div>
+            <div>
+              <label for="del-sel-monto">Monto</label>
+              <input id="del-sel-monto" type="text" readonly />
+            </div>
+          </div>
+          <div class="row">
+            <div class="grow">
+              <label for="del-sel-glosa">Glosa</label>
+              <input id="del-sel-glosa" type="text" readonly />
+            </div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="row">
+            <div class="grow">
+              <label for="del-motivo">Motivo (obligatorio)</label>
+              <input id="del-motivo" type="text" placeholder="Breve justificación de la cancelación/anulación" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn danger" type="submit" id="btn-del">Cancelar Definitivamente</button>
+            <button class="btn mid" type="button" id="btn-anular">Marcar como en Espera</button>
+          </div>
+          <p class="small muted" style="margin-top:6px">
+            La <b>cancelación definitiva</b> quita el movimiento del libro; <b>en espera</b> conserva el registro con estado “En espera” para trazabilidad.
+          </p>
+        </aside>
+      </form>
+    </section>
+
+    <!-- Éxito post-cancelación: botón para ir a Registrar Transacción -->
+    <section id="post-cancel" class="card" style="margin-top:12px; display:none">
+      <h2>Acción realizada</h2>
+      <p id="post-msg" class="small">La transacción fue cancelada correctamente.</p>
+      <div class="row" style="gap:8px">
+        <a id="go-registrar" class="btn" href="(p) registrar-transaccion.html">Registrar nueva Transacción</a>
+      </div>
+    </section>
+
+    <hr />
+  </main>
+
+  <!-- Footer global -->
+  <jrq-footer context="Cancelar Transacción"></jrq-footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
