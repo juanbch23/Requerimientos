@@ -6,9 +6,9 @@
 
 | Referencia | Función | Categoría |
 |------------|---------|-----------|
-| RF8.1.1 | Listar todo el personal registrado con sus datos principales (nombre, cargo, área). | Evidente |
-| RF8.1.2 | Permitir filtrar personal por cargo, área o estado laboral (activo, inactivo). | Evidente |
-| RF8.1.3 | Mostrar información detallada del empleado seleccionado (contacto, horario, supervisor). | Evidente |
+| RF8.1.1 | Listar todo el personal registrado con sus datos principales (código, nombre, DNI, área, cargo, estado). | Evidente |
+| RF8.1.2 | Permitir filtrar personal por período, área, cargo o estado laboral (activo, inactivo). | Evidente |
+| RF8.1.3 | Mostrar KPIs calculados (total empleados, activos, inactivos, áreas). | Evidente |
 | RF8.1.4 | Generar reporte de personal en formato PDF o Excel para impresión o análisis. | Evidente |
 
 ## REPORTE DE PERSONAL
@@ -19,25 +19,23 @@
 | **Referencias** | R8, R8.1, R8.1.1, R8.1.2, R8.1.3, R8.1.4 |
 | **Actores** | Propietario, Administrador |
 | **Tipo** | Primario |
-| **Propósito** | Permitir al actor obtener una visión consolidada de los usuarios por tipo y estado en un período definido para apoyar el control y la toma de decisiones. |
-| **Resumen** | El actor define fechas y criterios (tipo/estado), el sistema consulta la base de datos, agrupa y calcula totales/subtotales y muestra el reporte listo para revisión o exportación. |
+| **Propósito** | Permitir al actor obtener una visión consolidada de los empleados por área, cargo y estado en un período definido para apoyar el control y la toma de decisiones. |
+| **Resumen** | El actor define fechas y criterios (área/cargo/estado), el sistema consulta la base de datos, agrupa y calcula totales/subtotales y muestra el reporte listo para revisión o exportación. |
 
 ### CURSO NORMAL DE EVENTOS
 
 | Acción del Actor | Respuesta del Sistema |
 |------------------|----------------------|
-| 1. El caso de uso inicia cuando el actor accede al módulo Reportes y selecciona "Reporte de Personal" | 2. El sistema muestra la pantalla con filtros: rango de fechas, área, cargo, estado (activo/inactivo) y formato de exportación (PDF/Excel) |
-| 3. El actor selecciona los criterios deseados (área, cargo, estado) y define el rango de fechas | 4. El sistema valida que las fechas sean correctas y habilita el botón "Generar Reporte" |
-| 5. El actor presiona "Generar Reporte" | 6. El sistema consulta la base de datos y muestra una tabla con: Código, Nombre, DNI, Área, Cargo, Estado, Fecha Ingreso y Salario |
-| 7. El actor revisa los datos del reporte mostrado en pantalla | 8. El sistema presenta totales por área, estado y cantidad total de empleados, además de botones "Exportar PDF" y "Exportar Excel" |
-| 9. El actor selecciona un empleado específico para ver detalles | 10. El sistema muestra información completa del empleado: datos personales, contacto, horario, supervisor y historial laboral |
-| 11. El actor presiona "Exportar PDF" o "Exportar Excel" | 12. El sistema genera el archivo en el formato seleccionado y lo descarga automáticamente, dando fin al Caso de Uso |
+| 1. El caso de uso comienza cuando el actor ingresa al módulo Reportes y selecciona "Reporte de Personal" | 2. El sistema muestra la pantalla con filtros: Desde (fecha), Hasta (fecha), Área (Todas), Cargo (Todos), Estado (Todos/Activo/Inactivo) y el panel de resumen con KPIs |
+| 3. El actor selecciona el período de fechas y aplica filtros por área, cargo y/o estado según necesite | 4. El sistema valida las fechas ingresadas y carga las opciones dinámicas para área y cargo desde la base de datos |
+| 5. El actor presiona "Aplicar Filtros" | 6. El sistema consulta la base de datos y muestra tabla con: Código, Nombre, DNI, Área, Cargo, Estado |
+| 7. El actor revisa los datos del reporte mostrado en la sección Resultados | 8. El sistema presenta KPIs calculados: Total empleados, Activos, Inactivos, Áreas y habilita los botones "Exportar PDF" y "Exportar Excel" |
+| 9. El actor puede presionar "Limpiar" para resetear los filtros | 10. El sistema limpia todos los filtros y regresa a la vista inicial sin resultados |
+| 11. El actor presiona "Exportar PDF" o "Exportar Excel" | 12. El sistema genera el archivo en el formato seleccionado con los resultados filtrados y lo descarga automáticamente, dando fin al Caso de Uso |
 
 ### CURSOS ALTERNATIVOS
 
-**4.b** Si el actor ingresa una fecha "Hasta" anterior a la fecha "Desde", el sistema muestra: "Rango de fechas inválido." y no permite continuar.
-
-**6.b** Si no se encuentran empleados con los filtros aplicados, el sistema muestra el mensaje: "No hay personal registrado con los criterios seleccionados."
+**6.b** Si no se encuentran empleados con los filtros aplicados, el sistema muestra el mensaje: "No hay resultados con los filtros aplicados."
 
 ---
 
@@ -45,9 +43,9 @@
 
 | Referencia | Función | Categoría |
 |------------|---------|-----------|
-| RF8.2.1 | Listar todos los clientes registrados. | Evidente |
-| RF8.2.2 | Mostrar información de contacto y estado de cuenta de cada cliente. | Evidente |
-| RF8.2.3 | Permitir aplicar filtros por tipo de cliente o estado. | Evidente |
+| RF8.2.1 | Listar todos los clientes registrados con código, nombre, documento, tipo y estado. | Evidente |
+| RF8.2.2 | Mostrar información filtrada por período, tipo, estado y búsqueda por nombre/documento. | Evidente |
+| RF8.2.3 | Permitir aplicar múltiples filtros y mostrar KPIs (total, activos, inactivos, tipos). | Evidente |
 | RF8.2.4 | Exportar reporte a PDF o Excel. | Evidente |
 
 ## REPORTE DE CLIENTES
@@ -58,25 +56,23 @@
 | **Referencias** | R8, R8.2, R8.2.1, R8.2.2, R8.2.3, R8.2.4 |
 | **Actores** | Propietario, Administrador |
 | **Tipo** | Primario |
-| **Propósito** | Brindar al actor una visión consolidada de la cartera de clientes con información de contacto y estado financiero para apoyar decisiones comerciales. |
-| **Resumen** | El actor define criterios de búsqueda (tipo, estado), el sistema consulta y presenta el listado de clientes con datos relevantes, permitiendo exportación en múltiples formatos. |
+| **Propósito** | Brindar al actor una visión consolidada de la cartera de clientes con información de contacto para apoyar decisiones comerciales. |
+| **Resumen** | El actor define criterios de búsqueda (fechas/tipo/estado/nombre), el sistema consulta y presenta el listado de clientes con datos relevantes, permitiendo exportación en múltiples formatos. |
 
 ### CURSO NORMAL DE EVENTOS
 
 | Acción del Actor | Respuesta del Sistema |
 |------------------|----------------------|
-| 1. El caso de uso inicia cuando el actor accede al módulo Reportes y selecciona "Reporte de Clientes" | 2. El sistema muestra la pantalla con filtros: tipo de cliente (Persona/Empresa), estado (Activo/Inactivo), rango de fechas de registro y formato de exportación |
-| 3. El actor aplica filtros según sus necesidades (tipo, estado, fechas) | 4. El sistema valida los criterios ingresados y habilita el botón "Generar Reporte" |
-| 5. El actor presiona "Generar Reporte" | 6. El sistema consulta la base de datos y muestra tabla con: Código, Nombre/Razón Social, Documento, Tipo, Teléfono, Email, Estado y Saldo Pendiente |
-| 7. El actor revisa el listado de clientes mostrado | 8. El sistema presenta totales: cantidad por tipo de cliente, clientes activos/inactivos y saldo total pendiente de cobro |
-| 9. El actor selecciona un cliente específico para ver detalles | 10. El sistema muestra información completa: datos de contacto, historial de compras, estado de cuenta detallado y última transacción |
-| 11. El actor elige el formato de exportación (PDF/Excel) | 12. El sistema genera el archivo con el reporte completo y lo pone disponible para descarga, dando fin al Caso de Uso |
+| 1. El caso de uso comienza cuando el actor ingresa al módulo Reportes y selecciona "Reporte de Clientes" | 2. El sistema muestra la pantalla con filtros: Desde (fecha), Hasta (fecha), Tipo (Todos), Estado (Todos/Activo/Inactivo), Nombre o DNI/RUC y el panel de resumen |
+| 3. El actor aplica filtros según sus necesidades: período, tipo, estado o busca por nombre/documento | 4. El sistema valida los criterios ingresados y carga las opciones dinámicas para tipo desde la base de datos |
+| 5. El actor presiona "Aplicar Filtros" | 6. El sistema consulta la base de datos y muestra tabla con: Código, Nombre/Razón social, Documento, Tipo, Estado |
+| 7. El actor revisa el listado de clientes mostrado en la sección Resultados | 8. El sistema presenta KPIs calculados: Total clientes, Activos, Inactivos, Tipos y habilita los botones "Exportar PDF" y "Exportar Excel" |
+| 9. El actor puede presionar "Limpiar" para resetear todos los filtros | 10. El sistema limpia todos los filtros y regresa a la vista inicial sin resultados |
+| 11. El actor elige el formato de exportación presionando "Exportar PDF" o "Exportar Excel" | 12. El sistema genera el archivo con el reporte completo y lo pone disponible para descarga, dando fin al Caso de Uso |
 
 ### CURSOS ALTERNATIVOS
 
-**6.b** Si no existen clientes con los filtros aplicados, el sistema muestra: "No hay clientes registrados con los criterios seleccionados."
-
-**10.b** Si un cliente seleccionado no tiene transacciones asociadas, el sistema muestra: "Cliente sin historial de compras registradas."
+**6.b** Si no existen clientes con los filtros aplicados, el sistema muestra: "No hay resultados con los filtros aplicados."
 
 ---
 
@@ -84,10 +80,10 @@
 
 | Referencia | Función | Categoría |
 |------------|---------|-----------|
-| RF8.3.1 | Seleccionar tipo de inventario (insumos, productos terminados, herramientas). | Evidente |
-| RF8.3.2 | Consultar niveles actuales de stock, entradas y salidas del periodo. | Evidente |
-| RF8.3.3 | Identificar productos con stock crítico o vencimiento próximo. | Evidente |
-| RF8.3.4 | Mostrar el reporte en formato tabular con totales por categoría. | Evidente |
+| RF8.3.1 | Seleccionar tipo de inventario (insumos, productos terminados). | Evidente |
+| RF8.3.2 | Consultar niveles actuales de stock, entradas y salidas del periodo con límites mín/máx. | Evidente |
+| RF8.3.3 | Identificar productos con información de vencimiento y estado. | Evidente |
+| RF8.3.4 | Mostrar el reporte en formato tabular con KPIs (total, mayor stock, menor stock). | Evidente |
 
 ## REPORTE DE INVENTARIO
 
@@ -104,59 +100,53 @@
 
 | Acción del Actor | Respuesta del Sistema |
 |------------------|----------------------|
-| 1. El caso de uso inicia cuando el actor accede al módulo Reportes y selecciona "Reporte de Inventario" | 2. El sistema muestra la pantalla con filtros: tipo de inventario (Insumos/Productos Terminados/Herramientas), rango de fechas y alertas (Stock Crítico/Próximo Vencimiento) |
-| 3. El actor selecciona el tipo de inventario y período a consultar | 4. El sistema valida las fechas seleccionadas y carga las categorías disponibles para el tipo elegido |
-| 5. El actor configura las alertas deseadas y presiona "Generar Reporte" | 6. El sistema consulta movimientos del período y niveles actuales, mostrando tabla con: Código, Producto, Categoría, Stock Inicial, Entradas, Salidas, Stock Actual, Stock Mínimo y Estado |
-| 7. El actor revisa los datos del inventario mostrados | 8. El sistema resalta en rojo productos con stock crítico y en amarillo aquellos próximos a vencer, mostrando totales por categoría |
-| 9. El actor selecciona un producto para ver detalle de movimientos | 10. El sistema muestra historial detallado: fechas, tipos de movimiento, cantidades, responsables y observaciones del producto seleccionado |
-| 11. El actor puede filtrar por alertas específicas usando los botones "Solo Críticos" o "Próximos a Vencer" | 12. El sistema actualiza la tabla mostrando únicamente los productos que cumplen el criterio de alerta seleccionado |
-| 13. El actor presiona "Exportar" para descargar el reporte | 14. El sistema genera archivo PDF/Excel con el reporte completo incluyendo gráficos de stock por categoría, dando fin al Caso de Uso |
+| 1. El caso de uso comienza cuando el actor ingresa al módulo Reportes y selecciona "Reporte de Inventario" | 2. El sistema muestra la pantalla con filtros: Tipo de inventario (Insumos/Productos terminados), Desde (fecha), Hasta (fecha) y el panel de resumen |
+| 3. El actor selecciona el tipo de inventario (insumos o productos terminados) y define el período a consultar | 4. El sistema valida las fechas seleccionadas y prepara la consulta según el tipo de inventario elegido |
+| 5. El actor presiona "Aplicar Filtros" | 6. El sistema consulta movimientos del período y niveles actuales, mostrando tabla con: Código, Descripción, Stock, Mín, Máx, Entradas, Salidas, Vence, Estado |
+| 7. El actor revisa los datos del inventario mostrados en la sección Detalle | 8. El sistema presenta KPIs calculados: Total productos, Mayor stock (con detalle), Menor stock (con detalle) y habilita botones de exportación |
+| 9. El actor puede presionar "Limpiar" para resetear los filtros | 10. El sistema limpia todos los filtros y regresa a la vista inicial con tipo "insumos" por defecto |
+| 11. El actor presiona "Exportar PDF" o "Exportar Excel" | 12. El sistema genera archivo con el reporte completo incluyendo alertas de stock crítico y productos próximos a vencer, disponibilizando la descarga y dando fin al Caso de Uso |
 
 ### CURSOS ALTERNATIVOS
 
-**6.b** Si no hay movimientos de inventario en el período seleccionado, el sistema muestra: "Sin movimientos de inventario para el período consultado."
-
-**12.b** Si no existen productos con alertas activas, el sistema muestra: "No hay productos con alertas de stock crítico o próximo vencimiento."
+**6.b** Si no hay movimientos de inventario en el período seleccionado, el sistema muestra: "No hay información disponible."
 
 ---
 
-### RF8.4 REPORTE DE ORDEN DE PRODUCCIÓN
+### RF8.4 REPORTE DE PRODUCCIÓN
 
 | Referencia | Función | Categoría |
 |------------|---------|-----------|
-| RF8.4.1 | Seleccionar rango de fechas o número de orden. | Evidente |
+| RF8.4.1 | Seleccionar rango de fechas y línea de producción. | Evidente |
 | RF8.4.2 | Recuperar información de órdenes de producción finalizadas o en proceso. | Evidente |
 | RF8.4.3 | Calcular indicadores como eficiencia, tiempos de operación y desperdicio. | Oculta |
-| RF8.4.4 | Presentar los resultados en una tabla o gráfico comparativo. | Evidente |
+| RF8.4.4 | Presentar los resultados en una tabla con métricas de producción. | Evidente |
 
-## REPORTE DE ORDEN DE PRODUCCIÓN
+## REPORTE DE PRODUCCIÓN
 
 | Campo | Descripción |
 |-------|-------------|
-| **Caso de Uso** | REPORTE DE ORDEN DE PRODUCCIÓN |
+| **Caso de Uso** | REPORTE DE PRODUCCIÓN |
 | **Referencias** | R8, R8.4, R8.4.1, R8.4.2, R8.4.3, R8.4.4 |
 | **Actores** | Propietario, Jefe de Producción, Administrador |
 | **Tipo** | Primario |
 | **Propósito** | Brindar al actor indicadores y detalle de las órdenes de producción finalizadas o en proceso para evaluar eficiencia, tiempos y desperdicios. |
-| **Resumen** | El actor selecciona rango de fechas y filtros (línea/producto); el sistema recupera las OP, calcula KPIs (eficiencia, tiempo promedio, desperdicio) y presenta el informe con comparativos. |
+| **Resumen** | El actor selecciona rango de fechas y filtros (línea); el sistema recupera las OP, calcula KPIs (eficiencia, tiempo promedio, desperdicio) y presenta el informe con comparativos. |
 
 ### CURSO NORMAL DE EVENTOS
 
 | Acción del Actor | Respuesta del Sistema |
 |------------------|----------------------|
-| 1. El caso de uso inicia cuando el actor accede al módulo Reportes y selecciona "Reporte de Orden de Producción" | 2. El sistema muestra la pantalla con filtros: rango de fechas, número de OP específica, producto, línea de producción, estado (Finalizada/En Proceso/Todas) |
-| 3. El actor define el período y criterios de búsqueda deseados | 4. El sistema valida las fechas y habilita los filtros dependientes según la selección realizada |
-| 5. El actor presiona "Generar Reporte" | 6. El sistema consulta las OP y muestra tabla con: Número OP, Fecha, Producto, Cantidad Planificada, Cantidad Producida, Estado, Tiempo Total y Eficiencia (%) |
-| 7. El actor revisa las órdenes de producción listadas | 8. El sistema presenta KPIs calculados: Eficiencia Promedio, Tiempo Promedio por Unidad, Porcentaje de Desperdicio, Órdenes Completadas a Tiempo |
-| 9. El actor selecciona una OP específica para ver detalles | 10. El sistema muestra información completa: cronograma detallado, recursos asignados, consumo de insumos vs planificado, incidencias registradas |
-| 11. El actor puede acceder a la vista de "Comparativo de Eficiencia" | 12. El sistema genera gráfico comparativo mostrando eficiencia por producto, línea y período, identificando tendencias y desviaciones |
-| 13. El actor presiona "Exportar Reporte" | 14. El sistema genera archivo con reporte completo incluyendo gráficos de tendencias, análisis de KPIs y recomendaciones, dando fin al Caso de Uso |
+| 1. El caso de uso comienza cuando el actor ingresa al módulo Reportes y selecciona "Reporte de Producción" | 2. El sistema muestra la pantalla con filtros: Desde (fecha), Hasta (fecha), Línea (Todas/Mezclado/Envasado/Etiquetado) y el panel de indicadores |
+| 3. El actor define el período y selecciona la línea de producción deseada | 4. El sistema valida las fechas y habilita los filtros dependientes según la selección realizada |
+| 5. El actor presiona "Aplicar Filtros" | 6. El sistema consulta las OP y muestra tabla con: OP, Línea, Producto, Planif., Real, Inicio–Fin, Eficiencia, Desperdicio |
+| 7. El actor revisa las órdenes de producción listadas en la sección Detalle | 8. El sistema presenta KPIs calculados: Eficiencia (%), Tiempo prom. (h), Desperdicio (%) y habilita los botones de exportación |
+| 9. El actor puede presionar "Limpiar" para resetear todos los filtros | 10. El sistema limpia todos los filtros y regresa a la vista inicial sin resultados |
+| 11. El actor presiona "Exportar PDF" o "Exportar Excel" | 12. El sistema genera archivo con reporte completo incluyendo métricas de producción y análisis de KPIs, dando fin al Caso de Uso |
 
 ### CURSOS ALTERNATIVOS
 
-**6.b** Si no existen órdenes de producción en el período seleccionado, el sistema muestra: "No hay órdenes de producción para el período consultado."
-
-**10.b** Si una OP seleccionada no tiene datos de seguimiento completos, el sistema indica: "Información de seguimiento incompleta para esta orden."
+**6.b** Si no existen órdenes de producción en el período seleccionado, el sistema muestra: "No hay datos para el período/filtros seleccionados."
 
 ---
 
@@ -164,9 +154,9 @@
 
 | Referencia | Función | Categoría |
 |------------|---------|-----------|
-| RF8.5.1 | Seleccionar cliente para el reporte. | Evidente |
-| RF8.5.2 | Visualizar movimientos recientes y saldo actual. | Evidente |
-| RF8.5.3 | Incluir detalle de pagos pendientes o vencidos. | Evidente |
+| RF8.5.1 | Seleccionar período, cliente y tipo de comprobante para el reporte. | Evidente |
+| RF8.5.2 | Visualizar movimientos detallados con información de venta, fecha, cliente y productos. | Evidente |
+| RF8.5.3 | Incluir cálculos de subtotal, IGV y total acumulado. | Oculta |
 | RF8.5.4 | Exportar reporte a PDF o Excel. | Evidente |
 
 ## REPORTE DE ESTADO DE CUENTA
